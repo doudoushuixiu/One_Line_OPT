@@ -1,0 +1,553 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V2.10.2.149 for STM8                 16/Jul/2015  14:33:43
+# Copyright 2010-2014 IAR Systems AB.
+#
+#    Source file  =  
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\cc1101.c
+#    Command line =  
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\cc1101.c
+#        -e -Ohz --debug --code_model small --data_model medium -o
+#        "C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\stm8\LIB\dlstm8smn.h" -D USE_STM8L1526_EVAL -D STM8L05X_LD_VL -lC
+#        "C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\List\"
+#        -lA
+#        "C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\List\"
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\..\..\Libraries\STM8L15x_StdPeriph_Driver\inc\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\STM8_EVAL\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\STM8_EVAL\STM8L1526_EVAL\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\STM8_EVAL\Common\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\Misc\
+#        --require_prototypes --vregs 16
+#    List file    =  
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\List\cc1101.lst
+#    Object file  =  
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\Obj\cc1101.o
+#
+###############################################################################
+
+C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\cc1101.c
+      1          #include "cc1101.h"
+      2          #include "stm8l15x.h"
+      3          #include "stm8l15x_clk.h"
+      4          #include "stm8l15x_gpio.h" 
+      5          
+      6          
+
+   \                                 In section .near_func.text, align 1
+   \                     ?Subroutine0:
+   \   000000 A6 10        LD        A, #0x10
+   \   000002 AE 5005      LDW       X, #0x5005
+   \   000005 CD ....      CALL      L:GPIO_ReadInputDataBit
+   \   000008 A1 00        CP        A, #0x0
+   \   00000A 81           RET
+
+   \                                 In section .near_func.text, align 1
+   \                     ??Subroutine7_0:
+   \   000000 AE 5005      LDW       X, #0x5005
+   \   000003 CC ....      JP        L:GPIO_SetBits
+
+   \                                 In section .near_func.text, align 1
+      7          INT8U SpiTxRxByte(INT8U dat)
+      8          {
+   \                     SpiTxRxByte:
+   \   000000 CD ....      CALL      L:?push_w4
+   \   000003 3B ....      PUSH      S:?b10
+   \   000006 B7 ..        LD        S:?b10, A
+      9              INT8U i,temp;
+     10              temp = 0;	
+   \   000008 3F ..        CLR       S:?b9
+     11              SCK_0 ;
+   \   00000A CD ....      CALL      L:?Subroutine4
+     12              for(i=0; i<8; i++)
+   \                     ??CrossCallReturnLabel_26:
+   \   00000D 35 08 ....   MOV       S:?b8, #0x8
+     13              {
+     14                  if(dat & 0x80)  
+   \                     ??SpiTxRxByte_0:
+   \   000011 B6 ..        LD        A, S:?b10
+   \   000013 A5 80        BCP       A, #0x80
+   \   000015 27 07        JREQ      L:??SpiTxRxByte_1
+     15                  {MOSI_1;}
+   \   000017 A6 40        LD        A, #0x40
+   \   000019 CD ....      CALL      L:??Subroutine7_0
+   \                     ??CrossCallReturnLabel_14:
+   \   00001C 20 05        JRA       L:??CrossCallReturnLabel_24
+     16                  else 
+     17                  {MOSI_0;}
+   \                     ??SpiTxRxByte_1:
+   \   00001E A6 40        LD        A, #0x40
+   \   000020 CD ....      CALL      L:??Subroutine9_0
+     18                  dat <<= 1;
+   \                     ??CrossCallReturnLabel_24:
+   \   000023 B6 ..        LD        A, S:?b10
+   \   000025 48           SLL       A
+   \   000026 B7 ..        LD        S:?b10, A
+     19                  SCK_1;
+   \   000028 A6 20        LD        A, #0x20
+   \   00002A CD ....      CALL      L:??Subroutine7_0
+     20                  nop();
+   \                     ??CrossCallReturnLabel_13:
+   \   00002D 9D           NOP
+     21                  nop();
+   \   00002E 9D           NOP
+     22                  temp <<= 1;
+   \   00002F B6 ..        LD        A, S:?b9
+   \   000031 48           SLL       A
+   \   000032 B7 ..        LD        S:?b9, A
+     23                  if(MISO_INPUT)temp++;   
+   \   000034 CD ....      CALL      L:?Subroutine0
+   \                     ??CrossCallReturnLabel_6:
+   \   000037 27 05        JREQ      L:??SpiTxRxByte_2
+   \   000039 B6 ..        LD        A, S:?b9
+   \   00003B 4C           INC       A
+   \   00003C B7 ..        LD        S:?b9, A
+     24                  SCK_0; 
+   \                     ??SpiTxRxByte_2:
+   \   00003E CD ....      CALL      L:?Subroutine4
+     25                  nop();
+   \                     ??CrossCallReturnLabel_25:
+   \   000041 9D           NOP
+     26                  nop();
+   \   000042 9D           NOP
+     27              }
+   \   000043 B6 ..        LD        A, S:?b8
+   \   000045 4A           DEC       A
+   \   000046 B7 ..        LD        S:?b8, A
+   \   000048 26 C7        JRNE      L:??SpiTxRxByte_0
+     28              IWDG->KR = (0xAA);    //喂狗
+   \   00004A 35 AA 50E0   MOV       L:0x50e0, #0xaa
+     29              return temp;
+   \   00004E B6 ..        LD        A, S:?b9
+   \   000050 32 ....      POP       S:?b10
+   \   000053 CC ....      JP        L:?epilogue_w4
+     30          }
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine4:
+   \   000000 A6 20        LD        A, #0x20
+   \   000002              REQUIRE ??Subroutine9_0
+   \   000002              ;               // Fall through to label ??Subroutine9_0
+
+   \                                 In section .near_func.text, align 1
+   \                     ??Subroutine9_0:
+   \   000000 AE 5005      LDW       X, #0x5005
+   \   000003 CC ....      JP        L:GPIO_ResetBits
+     31          
+
+   \                                 In section .near_func.text, align 1
+     32          void Reset_CC1100(void) 
+     33          {
+     34              CSN_0; 
+   \                     Reset_CC1100:
+   \   000000 CD ....      CALL      L:??Subroutine8_0
+     35              SpiTxRxByte(0x30);    
+   \                     ??CrossCallReturnLabel_17:
+   \   000003 A6 30        LD        A, #0x30
+   \   000005 CD ....      CALL      L:SpiTxRxByte
+     36              CSN_1; 	  		
+   \   000008 A6 08        LD        A, #0x8
+   \   00000A AE 5005      LDW       X, #0x5005
+   \   00000D CC ....      JP        L:GPIO_SetBits
+     37          }
+
+   \                                 In section .near_func.text, align 1
+   \                     ??Subroutine8_0:
+   \   000000 A6 08        LD        A, #0x8
+   \   000002 AE 5005      LDW       X, #0x5005
+   \   000005 CC ....      JP        L:GPIO_ResetBits
+     38          
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine5:
+   \   000000 A6 08        LD        A, #0x8
+   \   000002              REQUIRE ??Subroutine7_0
+   \   000002              ;               // Fall through to label ??Subroutine7_0
+
+   \                                 In section .near_func.text, align 1
+     39          void halSpiWriteReg(INT8U addr, INT8U value) 
+     40          {
+   \                     halSpiWriteReg:
+   \   000000 CD ....      CALL      L:?push_w4
+   \   000003 B7 ..        LD        S:?b8, A
+   \   000005 45 .. ..     MOV       S:?b9, S:?b0
+     41              CSN_0;
+   \   000008 CD ....      CALL      L:??Subroutine8_0
+     42              while (MISO_INPUT);
+   \                     ??CrossCallReturnLabel_18:
+   \   00000B CD ....      CALL      L:?Subroutine0
+   \                     ??CrossCallReturnLabel_5:
+   \   00000E 26 FB        JRNE      L:??CrossCallReturnLabel_18
+     43              SpiTxRxByte(addr);		
+   \   000010 B6 ..        LD        A, S:?b8
+   \   000012 CD ....      CALL      L:SpiTxRxByte
+     44              SpiTxRxByte(value);		
+   \   000015 B6 ..        LD        A, S:?b9
+   \   000017 CD ....      CALL      L:?Subroutine3
+     45              CSN_1;
+     46          }
+   \                     ??CrossCallReturnLabel_10:
+   \   00001A CC ....      JP        L:?epilogue_w4
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine3:
+   \   000000 CD ....      CALL      L:SpiTxRxByte
+   \   000003              REQUIRE ??Subroutine6_0
+   \   000003              ;               // Fall through to label ??Subroutine6_0
+
+   \                                 In section .near_func.text, align 1
+   \                     ??Subroutine6_0:
+   \   000000 CD ....      CALL      L:?Subroutine5
+   \                     ??CrossCallReturnLabel_15:
+   \   000003 81           RET
+     47          
+
+   \                                 In section .near_func.text, align 1
+     48          void halSpiWriteBurstReg(INT8U addr, INT8U *buffer, INT8U count) 
+     49          {
+   \                     halSpiWriteBurstReg:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 BF ..        LDW       S:?w4, X
+   \   000005 45 .. ..     MOV       S:?b11, S:?b0
+     50              INT8U i, temp;
+     51              temp = addr | 0x40;
+   \   000008 AA 40        OR        A, #0x40
+   \   00000A B7 ..        LD        S:?b10, A
+     52              CSN_0;
+   \   00000C CD ....      CALL      L:??Subroutine8_0
+     53              while(MISO_INPUT);	
+   \                     ??CrossCallReturnLabel_19:
+   \   00000F CD ....      CALL      L:?Subroutine0
+   \                     ??CrossCallReturnLabel_4:
+   \   000012 26 FB        JRNE      L:??CrossCallReturnLabel_19
+     54              SpiTxRxByte(temp);	
+   \   000014 B6 ..        LD        A, S:?b10
+   \   000016 CD ....      CALL      L:SpiTxRxByte
+     55              for (i = 0; i < count; i++)
+   \   000019 3F ..        CLR       S:?b10
+   \   00001B 20 0F        JRA       L:??halSpiWriteBurstReg_0
+     56              {
+     57                  SpiTxRxByte(buffer[i]);
+   \                     ??halSpiWriteBurstReg_1:
+   \   00001D 5F           CLRW      X
+   \   00001E 41           EXG       A, XL
+   \   00001F 72BB ....    ADDW      X, S:?w4
+   \   000023 F6           LD        A, (X)
+   \   000024 CD ....      CALL      L:SpiTxRxByte
+     58              }
+   \   000027 B6 ..        LD        A, S:?b10
+   \   000029 4C           INC       A
+   \   00002A B7 ..        LD        S:?b10, A
+   \                     ??halSpiWriteBurstReg_0:
+   \   00002C B6 ..        LD        A, S:?b10
+   \   00002E B1 ..        CP        A, S:?b11
+   \   000030 25 EB        JRC       L:??halSpiWriteBurstReg_1
+     59              CSN_1;
+   \   000032 CD ....      CALL      L:??Subroutine6_0
+     60          }
+   \                     ??CrossCallReturnLabel_12:
+   \   000035 CC ....      JP        L:?epilogue_l2
+     61          
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine1:
+   \   000000 B7 ..        LD        S:?b8, A
+   \   000002              REQUIRE ??Subroutine8_0
+   \   000002              ;               // Fall through to label ??Subroutine8_0
+
+   \                                 In section .near_func.text, align 1
+     62          void halSpiStrobe(INT8U strobe) 
+     63          {
+   \                     halSpiStrobe:
+   \   000000 3B ....      PUSH      S:?b8
+   \   000003 CD ....      CALL      L:?Subroutine1
+     64              CSN_0;
+     65              while (MISO_INPUT);
+   \                     ??CrossCallReturnLabel_21:
+   \   000006 CD ....      CALL      L:?Subroutine0
+   \                     ??CrossCallReturnLabel_3:
+   \   000009 26 FB        JRNE      L:??CrossCallReturnLabel_21
+     66              SpiTxRxByte(strobe);		
+   \   00000B B6 ..        LD        A, S:?b8
+   \   00000D CD ....      CALL      L:?Subroutine3
+     67              CSN_1;
+     68          }
+   \                     ??CrossCallReturnLabel_9:
+   \   000010 32 ....      POP       S:?b8
+   \   000013 81           RET
+     69          
+
+   \                                 In section .near_func.text, align 1
+     70          INT8U halSpiReadReg(INT8U addr) 
+     71          {
+   \                     halSpiReadReg:
+   \   000000 3B ....      PUSH      S:?b8
+     72              INT8U temp, value;
+     73              temp = addr|0x80;
+   \   000003 AA 80        OR        A, #0x80
+   \   000005 CD ....      CALL      L:?Subroutine1
+     74              CSN_0;
+     75              while (MISO_INPUT);
+   \                     ??CrossCallReturnLabel_22:
+   \   000008 CD ....      CALL      L:?Subroutine0
+   \                     ??CrossCallReturnLabel_2:
+   \   00000B 26 FB        JRNE      L:??CrossCallReturnLabel_22
+     76              SpiTxRxByte(temp);
+   \   00000D CD ....      CALL      L:?Subroutine2
+     77              value = SpiTxRxByte(0);
+     78              CSN_1;
+     79              return value;
+   \                     ??CrossCallReturnLabel_8:
+   \   000010 32 ....      POP       S:?b8
+   \   000013 81           RET
+     80          }
+
+   \                                 In section .near_func.text, align 1
+   \                     ?Subroutine2:
+   \   000000 B6 ..        LD        A, S:?b8
+   \   000002 CD ....      CALL      L:SpiTxRxByte
+   \   000005 4F           CLR       A
+   \   000006 CD ....      CALL      L:SpiTxRxByte
+   \   000009 B7 ..        LD        S:?b8, A
+   \   00000B CD ....      CALL      L:?Subroutine5
+   \                     ??CrossCallReturnLabel_16:
+   \   00000E B6 ..        LD        A, S:?b8
+   \   000010 81           RET
+     81          
+
+   \                                 In section .near_func.text, align 1
+     82          void halSpiReadBurstReg(INT8U addr, INT8U *buffer, INT8U count) 
+     83          {
+   \                     halSpiReadBurstReg:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 CD ....      CALL      L:?push_w6
+   \   000006 BF ..        LDW       S:?w4, X
+   \   000008 45 .. ..     MOV       S:?b13, S:?b0
+     84              INT8U i,temp;
+     85              temp = addr | 0xC0;		
+   \   00000B AA C0        OR        A, #0xc0
+   \   00000D B7 ..        LD        S:?b10, A
+     86              CSN_0;
+   \   00000F CD ....      CALL      L:??Subroutine8_0
+     87              while (MISO_INPUT);
+   \                     ??CrossCallReturnLabel_20:
+   \   000012 CD ....      CALL      L:?Subroutine0
+   \                     ??CrossCallReturnLabel_1:
+   \   000015 26 FB        JRNE      L:??CrossCallReturnLabel_20
+     88              SpiTxRxByte(temp);   
+   \   000017 B6 ..        LD        A, S:?b10
+   \   000019 CD ....      CALL      L:SpiTxRxByte
+     89              for (i = 0; i < count; i++) 
+   \   00001C 3F ..        CLR       S:?b12
+   \   00001E 20 13        JRA       L:??halSpiReadBurstReg_0
+     90              {
+     91                  buffer[i] = SpiTxRxByte(0);
+   \                     ??halSpiReadBurstReg_1:
+   \   000020 5F           CLRW      X
+   \   000021 41           EXG       A, XL
+   \   000022 72BB ....    ADDW      X, S:?w4
+   \   000026 BF ..        LDW       S:?w5, X
+   \   000028 CD ....      CALL      L:SpiTxRxByte
+   \   00002B 92C7 ..      LD        [S:?w5.w], A
+     92              }
+   \   00002E B6 ..        LD        A, S:?b12
+   \   000030 4C           INC       A
+   \   000031 B7 ..        LD        S:?b12, A
+   \                     ??halSpiReadBurstReg_0:
+   \   000033 B6 ..        LD        A, S:?b12
+   \   000035 B1 ..        CP        A, S:?b13
+   \   000037 25 E7        JRC       L:??halSpiReadBurstReg_1
+     93              CSN_1;
+   \   000039 CD ....      CALL      L:??Subroutine6_0
+     94          }
+   \                     ??CrossCallReturnLabel_11:
+   \   00003C CC ....      JP        L:?epilogue_l2_w6
+     95          
+
+   \                                 In section .near_func.text, align 1
+     96          INT8U halSpiReadStatus(INT8U addr) 
+     97          {
+   \                     halSpiReadStatus:
+   \   000000 3B ....      PUSH      S:?b8
+     98              INT8U value,temp;
+     99              temp = addr | 0xC0;		
+   \   000003 AA C0        OR        A, #0xc0
+   \   000005 CD ....      CALL      L:?Subroutine1
+    100              CSN_0;
+    101              while (MISO_INPUT);
+   \                     ??CrossCallReturnLabel_23:
+   \   000008 CD ....      CALL      L:?Subroutine0
+   \                     ??CrossCallReturnLabel_0:
+   \   00000B 26 FB        JRNE      L:??CrossCallReturnLabel_23
+    102              SpiTxRxByte(temp);
+   \   00000D CD ....      CALL      L:?Subroutine2
+    103              value = SpiTxRxByte(0);
+    104              CSN_1;
+   \                     ??CrossCallReturnLabel_7:
+   \   000010 32 ....      POP       S:?b8
+   \   000013 81           RET
+    105              return value;
+    106          }
+    107          
+    108          
+    109          /**
+    110          @function：配置CC1100的寄存器 
+    111          **/
+
+   \                                 In section .near_func.text, align 1
+    112          void RadioSettings(void) 
+    113          {  
+   \                     RadioSettings:
+   \   000000 52 08        SUB       SP, #0x8
+    114              INT8U  PaTabel[8] = {0xC5 ,0xC5 ,0xC5 ,0xC5 ,0xC5 ,0xC5 ,0xC5 ,0xC5};   //10dBm
+   \   000002 90AE ....    LDW       Y, #?_0
+   \   000006 96           LDW       X, SP
+   \   000007 5C           INCW      X
+   \   000008 89           PUSHW     X
+   \   000009 A6 08        LD        A, #0x8
+   \   00000B CD ....      CALL      L:?move1616_v_x_y_a
+   \   00000E 85           POPW      X
+    115              
+    116              halSpiWriteReg(0x02,0x06);          //IOCFG0   
+   \   00000F 35 06 ....   MOV       S:?b0, #0x6
+   \   000013 A6 02        LD        A, #0x2
+   \   000015 CD ....      CALL      L:halSpiWriteReg
+    117              halSpiWriteReg(0x08,0x05);          //PKTCTRL0   
+   \   000018 35 05 ....   MOV       S:?b0, #0x5
+   \   00001C A6 08        LD        A, #0x8
+   \   00001E CD ....      CALL      L:halSpiWriteReg
+    118              halSpiWriteReg(0x0B,0x0C);          //FSCTRL1   
+   \   000021 35 0C ....   MOV       S:?b0, #0xc
+   \   000025 A6 0B        LD        A, #0xb
+   \   000027 CD ....      CALL      L:halSpiWriteReg
+    119              halSpiWriteReg(0x0D,0x10);          //FREQ2
+   \   00002A 35 10 ....   MOV       S:?b0, #0x10
+   \   00002E A6 0D        LD        A, #0xd
+   \   000030 CD ....      CALL      L:halSpiWriteReg
+    120              halSpiWriteReg(0x0E,0xB1);          //FREQ1
+   \   000033 35 B1 ....   MOV       S:?b0, #0xb1
+   \   000037 A6 0E        LD        A, #0xe
+   \   000039 CD ....      CALL      L:halSpiWriteReg
+    121              halSpiWriteReg(0x0F,0x3B);          //FREQ0
+   \   00003C 35 3B ....   MOV       S:?b0, #0x3b
+   \   000040 A6 0F        LD        A, #0xf
+   \   000042 CD ....      CALL      L:halSpiWriteReg
+    122              halSpiWriteReg(0x10,0x2C);          //MDMCFG4     //120kbps      250kbps:2D 3B
+   \   000045 35 2C ....   MOV       S:?b0, #0x2c
+   \   000049 A6 10        LD        A, #0x10
+   \   00004B CD ....      CALL      L:halSpiWriteReg
+    123              halSpiWriteReg(0x11,0x2E);          //MDMCFG3
+   \   00004E 35 2E ....   MOV       S:?b0, #0x2e
+   \   000052 A6 11        LD        A, #0x11
+   \   000054 CD ....      CALL      L:halSpiWriteReg
+    124              halSpiWriteReg(0x12,0x03);          //MDMCFG2    0x13 GFSK
+   \   000057 35 03 ....   MOV       S:?b0, #0x3
+   \   00005B A6 12        LD        A, #0x12
+   \   00005D CD ....      CALL      L:halSpiWriteReg
+    125              halSpiWriteReg(0x15,0x62);          //DEVIATN      
+   \   000060 35 62 ....   MOV       S:?b0, #0x62
+   \   000064 A6 15        LD        A, #0x15
+   \   000066 CD ....      CALL      L:halSpiWriteReg
+    126                
+    127              halSpiWriteReg(0x18,0x18);          //MCSM0 18   
+   \   000069 35 18 ....   MOV       S:?b0, #0x18
+   \   00006D A6 18        LD        A, #0x18
+   \   00006F CD ....      CALL      L:halSpiWriteReg
+    128              halSpiWriteReg(0x19,0x1D);          //FOCCFG
+   \   000072 35 1D ....   MOV       S:?b0, #0x1d
+   \   000076 A6 19        LD        A, #0x19
+   \   000078 CD ....      CALL      L:halSpiWriteReg
+    129              halSpiWriteReg(0x1A,0x1C);          //BSCFG
+   \   00007B 35 1C ....   MOV       S:?b0, #0x1c
+   \   00007F A6 1A        LD        A, #0x1a
+   \   000081 CD ....      CALL      L:halSpiWriteReg
+    130              halSpiWriteReg(0x1B,0xC7);          //AGCCTRL2
+   \   000084 35 C7 ....   MOV       S:?b0, #0xc7
+   \   000088 A6 1B        LD        A, #0x1b
+   \   00008A CD ....      CALL      L:halSpiWriteReg
+    131              halSpiWriteReg(0x1C,0x00);          //AGCCTRL1
+   \   00008D 3F ..        CLR       S:?b0
+   \   00008F A6 1C        LD        A, #0x1c
+   \   000091 CD ....      CALL      L:halSpiWriteReg
+    132              halSpiWriteReg(0x1D,0xB0);          //AGCCTRL0
+   \   000094 35 B0 ....   MOV       S:?b0, #0xb0
+   \   000098 A6 1D        LD        A, #0x1d
+   \   00009A CD ....      CALL      L:halSpiWriteReg
+    133              halSpiWriteReg(0x21,0xB6);          //FREND1 
+   \   00009D 35 B6 ....   MOV       S:?b0, #0xb6
+   \   0000A1 A6 21        LD        A, #0x21
+   \   0000A3 CD ....      CALL      L:halSpiWriteReg
+    134              halSpiWriteReg(0x23,0xEA);          //FSCAL3
+   \   0000A6 35 EA ....   MOV       S:?b0, #0xea
+   \   0000AA A6 23        LD        A, #0x23
+   \   0000AC CD ....      CALL      L:halSpiWriteReg
+    135              halSpiWriteReg(0x24,0x2A);          //FSCAL2    
+   \   0000AF 35 2A ....   MOV       S:?b0, #0x2a
+   \   0000B3 A6 24        LD        A, #0x24
+   \   0000B5 CD ....      CALL      L:halSpiWriteReg
+    136              halSpiWriteReg(0x25,0x00);          //FSCAL1
+   \   0000B8 3F ..        CLR       S:?b0
+   \   0000BA A6 25        LD        A, #0x25
+   \   0000BC CD ....      CALL      L:halSpiWriteReg
+    137              halSpiWriteReg(0x26,0x1F);          //FSCAL0     
+   \   0000BF 35 1F ....   MOV       S:?b0, #0x1f
+   \   0000C3 A6 26        LD        A, #0x26
+   \   0000C5 CD ....      CALL      L:halSpiWriteReg
+    138              
+    139              halSpiWriteBurstReg(0x3E,PaTabel,8);//配置cc1101功率 
+   \   0000C8 35 08 ....   MOV       S:?b0, #0x8
+   \   0000CC 96           LDW       X, SP
+   \   0000CD 5C           INCW      X
+   \   0000CE A6 3E        LD        A, #0x3e
+   \   0000D0 CD ....      CALL      L:halSpiWriteBurstReg
+    140          }
+   \   0000D3 5B 08        ADD       SP, #0x8
+   \   0000D5 81           RET
+
+   \                                 In section .near.rodata, align 1
+   \                     ?_0:
+   \   000000 C5 C5 C5 C5  DC8 197, 197, 197, 197, 197, 197, 197, 197
+   \          C5 C5 C5 C5 
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??Subroutine6_0
+       6  ??Subroutine7_0
+       8  ??Subroutine8_0
+       6  ??Subroutine9_0
+      11  ?Subroutine0
+       2  ?Subroutine1
+      17  ?Subroutine2
+       3  ?Subroutine3
+       2  ?Subroutine4
+       2  ?Subroutine5
+       8  ?_0
+     214  RadioSettings
+      16  Reset_CC1100
+      86  SpiTxRxByte
+      63  halSpiReadBurstReg
+      20  halSpiReadReg
+      20  halSpiReadStatus
+      20  halSpiStrobe
+      56  halSpiWriteBurstReg
+      29  halSpiWriteReg
+
+ 
+   8 bytes in section .near.rodata
+ 585 bytes in section .near_func.text
+ 
+ 585 bytes of CODE  memory
+   8 bytes of CONST memory
+
+Errors: none
+Warnings: none

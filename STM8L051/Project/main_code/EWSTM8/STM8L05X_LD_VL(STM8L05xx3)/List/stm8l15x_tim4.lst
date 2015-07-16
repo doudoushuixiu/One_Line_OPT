@@ -1,0 +1,1054 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V2.10.2.149 for STM8                 16/Jun/2015  16:46:11
+# Copyright 2010-2014 IAR Systems AB.
+#
+#    Source file  =  
+#        C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_tim4.c
+#    Command line =  
+#        C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_tim4.c
+#        -e -Ohz --debug --code_model small --data_model medium -o
+#        "C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\stm8\LIB\dlstm8smn.h" -D USE_STM8L1526_EVAL -D STM8L05X_LD_VL -lC
+#        "C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\List\"
+#        -lA
+#        "C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\List\"
+#        -I
+#        C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\..\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\..\..\..\Libraries\STM8L15x_StdPeriph_Driver\inc\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\STM8_EVAL\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\STM8_EVAL\STM8L1526_EVAL\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\STM8_EVAL\Common\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\Misc\
+#        --require_prototypes --vregs 16
+#    List file    =  
+#        C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\List\stm8l15x_tim4.lst
+#    Object file  =  
+#        C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\Obj\stm8l15x_tim4.o
+#
+###############################################################################
+
+C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_tim4.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    stm8l15x_tim4.c
+      4            * @author  MCD Application Team
+      5            * @version V1.6.0
+      6            * @date    28-June-2013
+      7            * @brief   This file provides firmware functions to manage the following 
+      8            *          functionalities of the TIM4 peripheral:
+      9            *            - TimeBase management
+     10            *            - Interrupts, DMA and flags management
+     11            *            - Clocks management
+     12            *            - Synchronization management
+     13            *
+     14            *  @verbatim
+     15            *  
+     16            *          ===================================================================
+     17            *                                 How to use this driver
+     18            *          ===================================================================
+     19            *          This driver provides functions to configure and initialise the TIM4 
+     20            *          peripheral
+     21            *          These functions are split in 4 groups: 
+     22            *   
+     23            *          1. TIM4 TimeBase management: this group includes all needed functions 
+     24            *             to configure the TIM Timebase unit:
+     25            *                   - Set/Get Prescaler
+     26            *                   - Set/Get Autoreload  
+     27            *                   - Select the One Pulse mode
+     28            *                   - Update Request Configuration
+     29            *                   - Update Disable Configuration
+     30            *                   - Auto-Preload Configuration 
+     31            *                   - Enable/Disable the counter
+     32            *                         
+     33            *          2. TIM4 interrupts, DMA and flags management
+     34            *                   - Enable/Disable interrupt sources
+     35            *                   - Get flags status
+     36            *                   - Clear flags/ Pending bits
+     37            *                   - Enable/Disable DMA requests 
+     38            *              
+     39            *          3. TIM4 clocks management: this group includes all needed functions 
+     40            *             to configure the clock controller unit:
+     41            *                   - Select internal clock
+     42            *         
+     43            *          4. TIM4 synchronization management: this group includes all needed 
+     44            *             functions to configure the Synchronization unit:
+     45            *                   - Select Input Trigger  
+     46            *                   - Select Output Trigger  
+     47            *                   - Select Master Slave Mode    
+     48            *      
+     49            *   
+     50            *  @endverbatim
+     51            *    
+     52            ******************************************************************************
+     53            *
+     54            * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+     55            * You may not use this file except in compliance with the License.
+     56            * You may obtain a copy of the License at:
+     57            *
+     58            *        http://www.st.com/software_license_agreement_liberty_v2
+     59            *
+     60            * Unless required by applicable law or agreed to in writing, software 
+     61            * distributed under the License is distributed on an "AS IS" BASIS, 
+     62            * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     63            * See the License for the specific language governing permissions and
+     64            * limitations under the License.
+     65            *
+     66            ****************************************************************************** 
+     67            */
+     68          
+     69          
+     70          /* Includes ------------------------------------------------------------------*/
+     71          #include "stm8l15x_tim4.h"
+     72          
+     73          /** @addtogroup STM8L15x_StdPeriph_Driver
+     74            * @{
+     75            */
+     76          
+     77          /** @defgroup TIM4
+     78            * @brief TIM4 driver modules
+     79            * @{
+     80            */
+     81            
+     82          /* Private typedef -----------------------------------------------------------*/
+     83          /* Private define ------------------------------------------------------------*/
+     84          /* Private macro -------------------------------------------------------------*/
+     85          /* Private variables ---------------------------------------------------------*/
+     86          /* Private function prototypes -----------------------------------------------*/
+     87          /** @defgroup TIM4_Private_Functions
+     88            * @{
+     89            */
+     90          
+     91          /** @defgroup TIM4_Group1 TimeBase management functions
+     92           *  @brief   TimeBase management functions 
+     93           *
+     94          @verbatim   
+     95           ===============================================================================
+     96                                 TimeBase management functions
+     97           ===============================================================================  
+     98            
+     99                 ===================================================================      
+    100                        TIM4 Driver: how to use it in Timing(Time base) Mode
+    101                 =================================================================== 
+    102                 To use the Timer in Timing(Time base) mode, the following steps are mandatory:
+    103                 
+    104                 1. Enable TIM4 clock using CLK_PeripheralClockConfig(CLK_Peripheral_TIM4, ENABLE) function.
+    105                  
+    106                 2. Call TIM4_TimeBaseInit() to configure the Time Base unit with the
+    107                    corresponding configuration.
+    108                    
+    109                 3. Enable global interrupts if you need to generate the update interrupt.
+    110                    
+    111                 4. Enable the corresponding interrupt using the function TIM4_ITConfig(TIM4_IT_Update) 
+    112                    
+    113                 5. Call the TIM4_Cmd(ENABLE) function to enable the TIM4 counter.
+    114                 
+    115                 Note1: All other functions can be used separately to modify, if needed,
+    116                    a specific feature of the Timer. 
+    117          
+    118          @endverbatim
+    119            * @{
+    120            */
+    121          
+    122          /**
+    123            * @brief  Deinitializes the TIM4 peripheral registers to their default reset values.
+    124            * @param  None
+    125            * @retval None
+    126            */
+
+   \                                 In section .near_func.text, align 1
+    127          void TIM4_DeInit(void)
+    128          {
+    129            TIM4->CR1   = TIM4_CR1_RESET_VALUE;
+   \                     TIM4_DeInit:
+   \   000000 725F 52E0    CLR       L:0x52e0
+    130            TIM4->CR2   = TIM4_CR2_RESET_VALUE;
+   \   000004 725F 52E1    CLR       L:0x52e1
+    131            TIM4->SMCR   = TIM4_SMCR_RESET_VALUE;
+   \   000008 725F 52E2    CLR       L:0x52e2
+    132            TIM4->IER   = TIM4_IER_RESET_VALUE;
+   \   00000C 725F 52E4    CLR       L:0x52e4
+    133            TIM4->CNTR   = TIM4_CNTR_RESET_VALUE;
+   \   000010 725F 52E7    CLR       L:0x52e7
+    134            TIM4->PSCR  = TIM4_PSCR_RESET_VALUE;
+   \   000014 725F 52E8    CLR       L:0x52e8
+    135            TIM4->ARR   = TIM4_ARR_RESET_VALUE;
+   \   000018 35 FF 52E9   MOV       L:0x52e9, #0xff
+    136            TIM4->SR1   = TIM4_SR1_RESET_VALUE;
+   \   00001C 725F 52E5    CLR       L:0x52e5
+    137          }
+   \   000020 81           RET
+    138          
+    139          /**
+    140            * @brief  Initializes the TIM4 Time Base Unit according to the specified parameters.
+    141            * @param  TIM4_Prescaler: Prescaler
+    142            *          This parameter can be one of the following values:
+    143            *            @arg TIM4_Prescaler_1: Time base Prescaler = 1 (No effect)
+    144            *            @arg TIM4_Prescaler_2: Time base Prescaler = 2
+    145            *            @arg TIM4_Prescaler_4: Time base Prescaler = 4
+    146            *            @arg TIM4_Prescaler_8: Time base Prescaler = 8
+    147            *            @arg TIM4_Prescaler_16: Time base Prescaler = 16
+    148            *            @arg TIM4_Prescaler_32: Time base Prescaler = 32
+    149            *            @arg TIM4_Prescaler_64: Time base Prescaler = 64
+    150            *            @arg TIM4_Prescaler_128: Time base Prescaler = 128
+    151            *            @arg TIM4_Prescaler_256: Time base Prescaler = 256
+    152            *            @arg TIM4_Prescaler_512: Time base Prescaler = 512
+    153            *            @arg TIM4_Prescaler_1024: Time base Prescaler = 1024
+    154            *            @arg TIM4_Prescaler_2048: Time base Prescaler = 2048
+    155            *            @arg TIM4_Prescaler_4096: Time base Prescaler = 4096
+    156            *            @arg TIM4_Prescaler_8192: Time base Prescaler = 8192
+    157            *            @arg TIM4_Prescaler_16384: Time base Prescaler = 16384
+    158            *            @arg TIM4_Prescaler_32768: Time base Prescaler = 32768                              
+    159            * @param  TIM4_Period: This parameter must be a value between 0x00 and 0xFF.
+    160            * @retval None
+    161            */
+
+   \                                 In section .near_func.text, align 1
+    162          void TIM4_TimeBaseInit(TIM4_Prescaler_TypeDef TIM4_Prescaler,
+    163                                 uint8_t TIM4_Period)
+    164          {
+   \                     TIM4_TimeBaseInit:
+   \   000000 B7 ..        LD        S:?b1, A
+    165            /* Check TIM4 prescaler value */
+    166            assert_param(IS_TIM4_Prescaler(TIM4_Prescaler));
+    167            /* Set the Autoreload value */
+    168            TIM4->ARR = (uint8_t)(TIM4_Period);
+   \   000002 B6 ..        LD        A, S:?b0
+   \   000004 C7 52E9      LD        L:0x52e9, A
+    169            /* Set the Prescaler value */
+    170            TIM4->PSCR = (uint8_t)(TIM4_Prescaler);
+   \   000007 B6 ..        LD        A, S:?b1
+   \   000009 C7 52E8      LD        L:0x52e8, A
+    171          
+    172            /* Generate an update event to reload the Prescaler value immediately */
+    173            TIM4->EGR = TIM4_EventSource_Update;
+   \   00000C 35 01 52E6   MOV       L:0x52e6, #0x1
+    174          }
+   \   000010 81           RET
+    175          
+    176          /**
+    177            * @brief  Configures the TIM4 Prescaler.
+    178            * @param  Prescaler: Specifies the Prescaler Register value
+    179            *          This parameter can be one of the following values:
+    180            *            @arg TIM4_Prescaler_1: Time base Prescaler = 1 (No effect)
+    181            *            @arg TIM4_Prescaler_2: Time base Prescaler = 2
+    182            *            @arg TIM4_Prescaler_4: Time base Prescaler = 4
+    183            *            @arg TIM4_Prescaler_8: Time base Prescaler = 8
+    184            *            @arg TIM4_Prescaler_16: Time base Prescaler = 16
+    185            *            @arg TIM4_Prescaler_32: Time base Prescaler = 32
+    186            *            @arg TIM4_Prescaler_64: Time base Prescaler = 64
+    187            *            @arg TIM4_Prescaler_128: Time base Prescaler = 128
+    188            *            @arg TIM4_Prescaler_256: Time base Prescaler = 256
+    189            *            @arg TIM4_Prescaler_512: Time base Prescaler = 512
+    190            *            @arg TIM4_Prescaler_1024: Time base Prescaler = 1024
+    191            *            @arg TIM4_Prescaler_2048: Time base Prescaler = 2048
+    192            *            @arg TIM4_Prescaler_4096: Time base Prescaler = 4096
+    193            *            @arg TIM4_Prescaler_8192: Time base Prescaler = 8192
+    194            *            @arg TIM4_Prescaler_16384: Time base Prescaler = 16384
+    195            *            @arg TIM4_Prescaler_32768: Time base Prescaler = 32768 
+    196            * @param  TIM4_PSCReloadMode: Specifies the TIM4 Prescaler Reload mode.
+    197            *          This parameter can be one of the following values:
+    198            *            @arg TIM4_PSCReloadMode_Update: Prescaler value is reloaded at every update
+    199            *            @arg TIM4_PSCReloadMode_Immediate: Prescaler value is reloaded immediatly
+    200            * @retval None
+    201            */
+
+   \                                 In section .near_func.text, align 1
+    202          void TIM4_PrescalerConfig(TIM4_Prescaler_TypeDef Prescaler,
+    203                                    TIM4_PSCReloadMode_TypeDef TIM4_PSCReloadMode)
+    204          {
+    205            /* Check the parameters */
+    206            assert_param(IS_TIM4_Prescaler_RELOAD(TIM4_PSCReloadMode));
+    207            assert_param(IS_TIM4_Prescaler(Prescaler));
+    208          
+    209            /* Set the Prescaler value */
+    210            TIM4->PSCR = (uint8_t) Prescaler;
+   \                     TIM4_PrescalerConfig:
+   \   000000 C7 52E8      LD        L:0x52e8, A
+    211          
+    212            /* Set or reset the UG Bit */
+    213            if (TIM4_PSCReloadMode == TIM4_PSCReloadMode_Immediate)
+   \   000003 B6 ..        LD        A, S:?b0
+   \   000005 A1 01        CP        A, #0x1
+   \   000007 26 05        JRNE      L:??TIM4_PrescalerConfig_0
+    214            {
+    215              TIM4->EGR |= TIM4_EGR_UG ;
+   \   000009 7210 52E6    BSET      L:0x52e6, #0x0
+   \   00000D 81           RET
+    216            }
+    217            else
+    218            {
+    219              TIM4->EGR &= (uint8_t)(~TIM4_EGR_UG) ;
+   \                     ??TIM4_PrescalerConfig_0:
+   \   00000E 7211 52E6    BRES      L:0x52e6, #0x0
+    220            }
+    221          }
+   \   000012 81           RET
+    222          
+    223          /**
+    224            * @brief  Sets the TIM4 Counter Register value.
+    225            * @param  Counter: Specifies the Counter register new value.
+    226            *          This parameter is between 0x00 and 0xFF.
+    227            * @retval None
+    228            */
+
+   \                                 In section .near_func.text, align 1
+    229          void TIM4_SetCounter(uint8_t Counter)
+    230          {
+    231            /* Set the Counter Register value */
+    232            TIM4->CNTR = (uint8_t)(Counter);
+   \                     TIM4_SetCounter:
+   \   000000 C7 52E7      LD        L:0x52e7, A
+    233          }
+   \   000003 81           RET
+    234          
+    235          /**
+    236            * @brief  Sets the TIM4 Autoreload Register value.
+    237            * @param  Autoreload: Specifies the Autoreload register new value.
+    238            *          This parameter is between 0x00 and 0xFF.
+    239            * @retval None
+    240            */
+
+   \                                 In section .near_func.text, align 1
+    241          void TIM4_SetAutoreload(uint8_t Autoreload)
+    242          {
+    243            /* Set the Autoreload Register value */
+    244            TIM4->ARR = (uint8_t)(Autoreload);
+   \                     TIM4_SetAutoreload:
+   \   000000 C7 52E9      LD        L:0x52e9, A
+    245          }
+   \   000003 81           RET
+    246          
+    247          /**
+    248            * @brief  Gets the TIM4 Counter value.
+    249            * @param  None
+    250            * @retval Counter Register value.
+    251            */
+
+   \                                 In section .near_func.text, align 1
+    252          uint8_t TIM4_GetCounter(void)
+    253          {
+    254            uint8_t tmpcntr = 0;
+    255            tmpcntr = TIM4->CNTR;
+   \                     TIM4_GetCounter:
+   \   000000 C6 52E7      LD        A, L:0x52e7
+    256            /* Get the Counter Register value */
+    257            return ((uint8_t)tmpcntr);
+   \   000003 81           RET
+    258          }
+    259          
+    260          /**
+    261            * @brief  Gets the TIM4 Prescaler value.
+    262            * @param  None
+    263            * @retval TIM4 Prescaler can be one of the following values:
+    264            *            - TIM4_Prescaler_1: Time base Prescaler = 1 (No effect)
+    265            *            - TIM4_Prescaler_2: Time base Prescaler = 2
+    266            *            - TIM4_Prescaler_4: Time base Prescaler = 4
+    267            *            - TIM4_Prescaler_8: Time base Prescaler = 8
+    268            *            - TIM4_Prescaler_16: Time base Prescaler = 16
+    269            *            - TIM4_Prescaler_32: Time base Prescaler = 32
+    270            *            - TIM4_Prescaler_64: Time base Prescaler = 64
+    271            *            - TIM4_Prescaler_128: Time base Prescaler = 128
+    272            *            - TIM4_Prescaler_256: Time base Prescaler = 256
+    273            *            - TIM4_Prescaler_512: Time base Prescaler = 512
+    274            *            - TIM4_Prescaler_1024: Time base Prescaler = 1024
+    275            *            - TIM4_Prescaler_2048: Time base Prescaler = 2048
+    276            *            - TIM4_Prescaler_4096: Time base Prescaler = 4096
+    277            *            - TIM4_Prescaler_8192: Time base Prescaler = 8192
+    278            *            - TIM4_Prescaler_16384: Time base Prescaler = 16384
+    279            *            - TIM4_Prescaler_32768: Time base Prescaler = 32768  
+    280            */
+
+   \                                 In section .near_func.text, align 1
+    281          TIM4_Prescaler_TypeDef TIM4_GetPrescaler(void)
+    282          {
+    283            /* Get the Prescaler Register value */
+    284            return ((TIM4_Prescaler_TypeDef)TIM4->PSCR);
+   \                     TIM4_GetPrescaler:
+   \   000000 C6 52E8      LD        A, L:0x52e8
+   \   000003 81           RET
+    285          }
+    286          
+    287          /**
+    288            * @brief  Enables or Disables the TIM4 Update event.
+    289            * @param  NewState: The new state of the TIM4 peripheral Preload register.
+    290            *          This parameter can be ENABLE or DISABLE
+    291            * @retval None
+    292            */
+
+   \                                 In section .near_func.text, align 1
+    293          void TIM4_UpdateDisableConfig(FunctionalState NewState)
+    294          {
+    295            /* Check the parameters */
+    296            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    297          
+    298            /* Set or Reset the UDIS Bit */
+    299            if (NewState != DISABLE)
+   \                     TIM4_UpdateDisableConfig:
+   \   000000 4D           TNZ       A
+   \   000001 27 05        JREQ      L:??TIM4_UpdateDisableConfig_0
+    300            {
+    301              TIM4->CR1 |= TIM4_CR1_UDIS ;
+   \   000003 7212 52E0    BSET      L:0x52e0, #0x1
+   \   000007 81           RET
+    302            }
+    303            else
+    304            {
+    305              TIM4->CR1 &= (uint8_t)(~TIM4_CR1_UDIS) ;
+   \                     ??TIM4_UpdateDisableConfig_0:
+   \   000008 7213 52E0    BRES      L:0x52e0, #0x1
+    306            }
+    307          }
+   \   00000C 81           RET
+    308          
+    309          /**
+    310            * @brief  Selects the TIM4 Update Request Interrupt source.
+    311            * @param  TIM4_UpdateSource: Specifies the Update source.
+    312            *          This parameter can be one of the following values:
+    313            *            @arg TIM4_UpdateSource_Global: Global Update request source
+    314            *            @arg TIM4_UpdateSource_Regular: Regular Update request source
+    315            * @retval None
+    316            */
+
+   \                                 In section .near_func.text, align 1
+    317          void TIM4_UpdateRequestConfig(TIM4_UpdateSource_TypeDef TIM4_UpdateSource)
+    318          {
+    319            /* Check the parameters */
+    320            assert_param(IS_TIM4_UPDATE_SOURCE(TIM4_UpdateSource));
+    321          
+    322            /* Set or Reset the URS Bit */
+    323            if (TIM4_UpdateSource == TIM4_UpdateSource_Regular)
+   \                     TIM4_UpdateRequestConfig:
+   \   000000 A1 01        CP        A, #0x1
+   \   000002 26 05        JRNE      L:??TIM4_UpdateRequestConfig_0
+    324            {
+    325              TIM4->CR1 |= TIM4_CR1_URS ;
+   \   000004 7214 52E0    BSET      L:0x52e0, #0x2
+   \   000008 81           RET
+    326            }
+    327            else
+    328            {
+    329              TIM4->CR1 &= (uint8_t)(~TIM4_CR1_URS) ;
+   \                     ??TIM4_UpdateRequestConfig_0:
+   \   000009 7215 52E0    BRES      L:0x52e0, #0x2
+    330            }
+    331          }
+   \   00000D 81           RET
+    332          
+    333          /**
+    334            * @brief  Enables or disables TIM4 peripheral Preload register on ARR.
+    335            * @param  NewState: The new state of the TIM4 peripheral Preload register.
+    336            *          This parameter can be ENABLE or DISABLE
+    337            * @retval None
+    338            */
+
+   \                                 In section .near_func.text, align 1
+    339          void TIM4_ARRPreloadConfig(FunctionalState NewState)
+    340          {
+    341            /* Check the parameters */
+    342            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    343          
+    344            /* Set or Reset the ARPE Bit */
+    345            if (NewState != DISABLE)
+   \                     TIM4_ARRPreloadConfig:
+   \   000000 4D           TNZ       A
+   \   000001 27 05        JREQ      L:??TIM4_ARRPreloadConfig_0
+    346            {
+    347              TIM4->CR1 |= TIM4_CR1_ARPE ;
+   \   000003 721E 52E0    BSET      L:0x52e0, #0x7
+   \   000007 81           RET
+    348            }
+    349            else
+    350            {
+    351              TIM4->CR1 &= (uint8_t)(~TIM4_CR1_ARPE) ;
+   \                     ??TIM4_ARRPreloadConfig_0:
+   \   000008 721F 52E0    BRES      L:0x52e0, #0x7
+    352            }
+    353          }
+   \   00000C 81           RET
+    354          
+    355          /**
+    356            * @brief  Selects the TIM4’s One Pulse Mode.
+    357            * @param  TIM4_OPMode: Specifies the OPM Mode to be used.
+    358            *          This parameter can be one of the following values:
+    359            *            @arg TIM4_OPMode_Single: Single one Pulse mode (OPM Active)
+    360            *            @arg TIM4_OPMode_Repetitive: Repetitive Pulse mode (OPM inactive)
+    361            * @retval None
+    362            */
+
+   \                                 In section .near_func.text, align 1
+    363          void TIM4_SelectOnePulseMode(TIM4_OPMode_TypeDef TIM4_OPMode)
+    364          {
+    365            /* Check the parameters */
+    366            assert_param(IS_TIM4_OPM_MODE(TIM4_OPMode));
+    367          
+    368            /* Set or Reset the OPM Bit */
+    369            if (TIM4_OPMode == TIM4_OPMode_Single)
+   \                     TIM4_SelectOnePulseMode:
+   \   000000 A1 01        CP        A, #0x1
+   \   000002 26 05        JRNE      L:??TIM4_SelectOnePulseMode_0
+    370            {
+    371              TIM4->CR1 |= TIM4_CR1_OPM ;
+   \   000004 7216 52E0    BSET      L:0x52e0, #0x3
+   \   000008 81           RET
+    372            }
+    373            else
+    374            {
+    375              TIM4->CR1 &= (uint8_t)(~TIM4_CR1_OPM) ;
+   \                     ??TIM4_SelectOnePulseMode_0:
+   \   000009 7217 52E0    BRES      L:0x52e0, #0x3
+    376            }
+    377          }
+   \   00000D 81           RET
+    378          
+    379          /**
+    380            * @brief  Enables or disables the TIM4 peripheral.
+    381            * @param  NewState: The new state of the TIM4 peripheral.
+    382            *          This parameter can be ENABLE or DISABLE
+    383            * @retval None
+    384            */
+
+   \                                 In section .near_func.text, align 1
+    385          void TIM4_Cmd(FunctionalState NewState)
+    386          {
+    387            /* Check the parameters */
+    388            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    389          
+    390            /* set or Reset the CEN Bit */
+    391            if (NewState != DISABLE)
+   \                     TIM4_Cmd:
+   \   000000 4D           TNZ       A
+   \   000001 27 05        JREQ      L:??TIM4_Cmd_0
+    392            {
+    393              TIM4->CR1 |= TIM4_CR1_CEN ;
+   \   000003 7210 52E0    BSET      L:0x52e0, #0x0
+   \   000007 81           RET
+    394            }
+    395            else
+    396            {
+    397              TIM4->CR1 &= (uint8_t)(~TIM4_CR1_CEN) ;
+   \                     ??TIM4_Cmd_0:
+   \   000008 7211 52E0    BRES      L:0x52e0, #0x0
+    398            }
+    399          }
+   \   00000C 81           RET
+    400          
+    401          /**
+    402            * @}
+    403            */
+    404          
+    405          /** @defgroup TIM4_Group2 Interrupts DMA and flags management functions
+    406           *  @brief    Interrupts, DMA and flags management functions 
+    407           *
+    408          @verbatim   
+    409           ===============================================================================
+    410                           Interrupts, DMA and flags management functions
+    411           ===============================================================================  
+    412          
+    413          @endverbatim
+    414            * @{
+    415            */
+    416          
+    417          /**
+    418            * @brief  Enables or disables the specified TIM4 interrupts.
+    419            * @param  TIM4_IT: Specifies the TIM4 interrupts sources to be enabled or disabled.
+    420            *          This parameter can be one of the following values:
+    421            *            @arg TIM4_IT_Update: Update
+    422            *            @arg TIM4_IT_Trigger: Trigger
+    423            * @param  NewState: The new state of the TIM4 peripheral.
+    424            *          This parameter can be ENABLE or DISABLE
+    425            * @retval None
+    426            */
+
+   \                                 In section .near_func.text, align 1
+    427          void TIM4_ITConfig(TIM4_IT_TypeDef TIM4_IT, FunctionalState NewState)
+    428          {
+    429            /* Check the parameters */
+    430            assert_param(IS_TIM4_IT(TIM4_IT));
+    431            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    432          
+    433            if (NewState != DISABLE)
+   \                     TIM4_ITConfig:
+   \   000000 3D ..        TNZ       S:?b0
+   \   000002 27 05        JREQ      L:??TIM4_ITConfig_0
+    434            {
+    435              /* Enable the Interrupt sources */
+    436              TIM4->IER |= (uint8_t)TIM4_IT;
+   \   000004 CA 52E4      OR        A, L:0x52e4
+   \   000007 20 04        JRA       L:??TIM4_ITConfig_1
+    437            }
+    438            else
+    439            {
+    440              /* Disable the Interrupt sources */
+    441              TIM4->IER &= (uint8_t)(~(uint8_t)TIM4_IT);
+   \                     ??TIM4_ITConfig_0:
+   \   000009 43           CPL       A
+   \   00000A C4 52E4      AND       A, L:0x52e4
+   \                     ??TIM4_ITConfig_1:
+   \   00000D C7 52E4      LD        L:0x52e4, A
+    442            }
+    443          }
+   \   000010 81           RET
+    444          
+    445          /**
+    446            * @brief  Configures the TIM4 event to be generated by software.
+    447            * @param  TIM4_EventSource: Specifies the event source.
+    448            *          This parameter can be one of the following values:
+    449            *            @arg TIM4_EventSource_Update: Update
+    450            *            @arg TIM4_EventSource_Trigger: Trigger
+    451            * @retval None
+    452            */
+
+   \                                 In section .near_func.text, align 1
+    453          void TIM4_GenerateEvent(TIM4_EventSource_TypeDef TIM4_EventSource)
+    454          {
+    455            /* Check the parameters */
+    456            assert_param(IS_TIM4_EVENT_SOURCE((uint8_t)TIM4_EventSource));
+    457          
+    458            /* Set the event sources */
+    459            TIM4->EGR |= (uint8_t)TIM4_EventSource;
+   \                     TIM4_GenerateEvent:
+   \   000000 CA 52E6      OR        A, L:0x52e6
+   \   000003 C7 52E6      LD        L:0x52e6, A
+    460          }
+   \   000006 81           RET
+    461          
+    462          /**
+    463            * @brief  Checks whether the specified TIM4 flag is set or not.
+    464            * @param  TIM4_FLAG: Specifies the flag to check.
+    465            *          This parameter can be one of the following values:
+    466            *            @arg TIM4_FLAG_Update: Update
+    467            *            @arg TIM4_FLAG_Trigger: Trigger
+    468            * @retval FlagStatus: The new state of TIM4_FLAG.
+    469            *          This parameter can be SET or RESET.
+    470            */
+
+   \                                 In section .near_func.text, align 1
+    471          FlagStatus TIM4_GetFlagStatus(TIM4_FLAG_TypeDef TIM4_FLAG)
+    472          {
+    473            FlagStatus bitstatus = RESET;
+   \                     TIM4_GetFlagStatus:
+   \   000000 3F ..        CLR       S:?b0
+    474          
+    475            /* Check the parameters */
+    476            assert_param(IS_TIM4_GET_FLAG(TIM4_FLAG));
+    477          
+    478            if ((TIM4->SR1 & (uint8_t)TIM4_FLAG)  != 0)
+   \   000002 C5 52E5      BCP       A, L:0x52e5
+   \   000005 27 04        JREQ      L:??TIM4_GetFlagStatus_0
+    479            {
+    480              bitstatus = SET;
+   \   000007 35 01 ....   MOV       S:?b0, #0x1
+    481            }
+    482            else
+    483            {
+    484              bitstatus = RESET;
+    485            }
+    486            return ((FlagStatus)bitstatus);
+   \                     ??TIM4_GetFlagStatus_0:
+   \   00000B B6 ..        LD        A, S:?b0
+   \   00000D 81           RET
+    487          }
+    488          
+    489          /**
+    490            * @brief  Clears the TIM’s pending flags.
+    491            * @param  TIM4_FLAG: Specifies the flag to clear.
+    492            *          This parameter can be one of the following values:
+    493            *            @arg TIM4_FLAG_Update: Update
+    494            *            @arg TIM4_FLAG_Trigger: Trigger
+    495            * @retval None
+    496            */
+
+   \                                 In section .near_func.text, align 1
+    497          void TIM4_ClearFlag(TIM4_FLAG_TypeDef TIM4_FLAG)
+    498          {
+    499            /* Check the parameters */
+    500            assert_param(IS_TIM4_CLEAR_FLAG((uint8_t)TIM4_FLAG));
+    501            /* Clear the flags (rc_w0) clear this bit by writing 0. Writing ‘1’ has no effect*/
+    502            TIM4->SR1 = (uint8_t)(~((uint8_t)TIM4_FLAG));
+   \                     TIM4_ClearFlag:
+   \   000000 43           CPL       A
+   \   000001 C7 52E5      LD        L:0x52e5, A
+    503          }
+   \   000004 81           RET
+    504          
+    505          /**
+    506            * @brief  Checks whether the TIM4 interrupt has occurred or not.
+    507            * @param  TIM4_IT: Specifies the TIM4 interrupt source to check.
+    508            *          This parameter can be one of the following values:
+    509            *            @arg TIM4_IT_Update: Update
+    510            *            @arg TIM4_IT_Trigger: Trigger
+    511            * @retval ITStatus: The new state of the TIM4_IT.
+    512            *          This parameter can be SET or RESET
+    513            */
+    514          
+
+   \                                 In section .near_func.text, align 1
+    515          ITStatus TIM4_GetITStatus(TIM4_IT_TypeDef TIM4_IT)
+    516          {
+   \                     TIM4_GetITStatus:
+   \   000000 B7 ..        LD        S:?b1, A
+    517            ITStatus bitstatus = RESET;
+   \   000002 3F ..        CLR       S:?b0
+    518          
+    519            uint8_t itStatus = 0x0, itEnable = 0x0;
+    520          
+    521            /* Check the parameters */
+    522            assert_param(IS_TIM4_GET_IT(TIM4_IT));
+    523          
+    524            itStatus = (uint8_t)(TIM4->SR1 & (uint8_t)TIM4_IT);
+   \   000004 C6 52E5      LD        A, L:0x52e5
+   \   000007 B7 ..        LD        S:?b3, A
+    525          
+    526            itEnable = (uint8_t)(TIM4->IER & (uint8_t)TIM4_IT);
+   \   000009 B6 ..        LD        A, S:?b1
+   \   00000B C4 52E4      AND       A, L:0x52e4
+   \   00000E B7 ..        LD        S:?b2, A
+    527          
+    528            if ((itStatus != (uint8_t)RESET ) && (itEnable != (uint8_t)RESET ))
+   \   000010 B6 ..        LD        A, S:?b1
+   \   000012 B5 ..        BCP       A, S:?b3
+   \   000014 27 08        JREQ      L:??TIM4_GetITStatus_0
+   \   000016 3D ..        TNZ       S:?b2
+   \   000018 27 04        JREQ      L:??TIM4_GetITStatus_0
+    529            {
+    530              bitstatus = (ITStatus)SET;
+   \   00001A 35 01 ....   MOV       S:?b0, #0x1
+    531            }
+    532            else
+    533            {
+    534              bitstatus = (ITStatus)RESET;
+    535            }
+    536            return ((ITStatus)bitstatus);
+   \                     ??TIM4_GetITStatus_0:
+   \   00001E B6 ..        LD        A, S:?b0
+   \   000020 81           RET
+    537          }
+    538          
+    539          /**
+    540            * @brief  Clears the TIM4's interrupt pending bits.
+    541            * @param  TIM4_IT: Specifies the pending bit to clear.
+    542            *          This parameter can be one of the following values:
+    543            *            @arg TIM4_IT_Update: Update
+    544            *            @arg TIM4_IT_Trigger: Trigger
+    545            * @retval None
+    546            */
+
+   \                                 In section .near_func.text, align 1
+    547          void TIM4_ClearITPendingBit(TIM4_IT_TypeDef TIM4_IT)
+    548          {
+    549            /* Check the parameters */
+    550            assert_param(IS_TIM4_IT(TIM4_IT));
+    551          
+    552            /* Clear the IT pending Bit */
+    553            TIM4->SR1 = (uint8_t)(~(uint8_t)TIM4_IT);
+   \                     TIM4_ClearITPendingBit:
+   \   000000 43           CPL       A
+   \   000001 C7 52E5      LD        L:0x52e5, A
+    554          }
+   \   000004 81           RET
+    555          
+    556          /**
+    557            * @brief  Enables or disables the TIMx’s DMA Requests.
+    558            * @param  TIM4_DMASources: specifies the DMA Request sources.
+    559            *          This parameter can be one of the following values:
+    560            *            @arg TIM4_DMASource_Update: Update
+    561            * @param  NewState: new state of the DMA Request sources.
+    562            *          This parameter can be: ENABLE or DISABLE.
+    563            * @retval None
+    564            */
+
+   \                                 In section .near_func.text, align 1
+    565          void TIM4_DMACmd( TIM4_DMASource_TypeDef TIM4_DMASource, FunctionalState NewState)
+    566          {
+    567            /* Check the parameters */
+    568            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    569            assert_param(IS_TIM4_DMA_SOURCE(TIM4_DMASource));
+    570          
+    571            if (NewState != DISABLE)
+   \                     TIM4_DMACmd:
+   \   000000 3D ..        TNZ       S:?b0
+   \   000002 27 05        JREQ      L:??TIM4_DMACmd_0
+    572            {
+    573              /* Enable the DMA sources */
+    574              TIM4->DER |= (uint8_t)TIM4_DMASource;
+   \   000004 CA 52E3      OR        A, L:0x52e3
+   \   000007 20 04        JRA       L:??TIM4_DMACmd_1
+    575            }
+    576            else
+    577            {
+    578              /* Disable the DMA sources */
+    579              TIM4->DER &= (uint8_t)~TIM4_DMASource;
+   \                     ??TIM4_DMACmd_0:
+   \   000009 43           CPL       A
+   \   00000A C4 52E3      AND       A, L:0x52e3
+   \                     ??TIM4_DMACmd_1:
+   \   00000D C7 52E3      LD        L:0x52e3, A
+    580            }
+    581          }
+   \   000010 81           RET
+    582          
+    583          /**
+    584            * @}
+    585            */
+    586          
+    587          /** @defgroup TIM4_Group3 Clocks management functions
+    588           *  @brief    Clocks management functions
+    589           *
+    590          @verbatim   
+    591           ===============================================================================
+    592                                   Clocks management functions
+    593           ===============================================================================  
+    594          
+    595          @endverbatim
+    596            * @{
+    597            */
+    598          
+    599          /**
+    600            * @brief  Enables the TIM4 internal Clock.
+    601            * @param  None
+    602            * @retval None
+    603            */
+
+   \                                 In section .near_func.text, align 1
+    604          void TIM4_InternalClockConfig(void)
+    605          {
+    606            /* Disable slave mode to clock the prescaler directly with the internal clock */
+    607            TIM4->SMCR &=  (uint8_t)(~TIM4_SMCR_SMS);
+   \                     TIM4_InternalClockConfig:
+   \   000000 C6 52E2      LD        A, L:0x52e2
+   \   000003 A4 F8        AND       A, #0xf8
+   \   000005 C7 52E2      LD        L:0x52e2, A
+    608          }
+   \   000008 81           RET
+    609          
+    610          /**
+    611            * @}
+    612            */
+    613          
+    614          /** @defgroup TIM4_Group4 Synchronization management functions
+    615           *  @brief    Synchronization management functions 
+    616           *
+    617          @verbatim   
+    618           ===============================================================================
+    619                                 Synchronization management functions
+    620           ===============================================================================  
+    621                             
+    622                 ===================================================================      
+    623                        TIM4 Driver: how to use it in synchronization Mode
+    624                 =================================================================== 
+    625                 Case of two/several Timers
+    626                 **************************
+    627                 1. If TIM4 is used as master to other timers use the following functions:
+    628                    - TIM4_SelectOutputTrigger()
+    629                    - TIM4_SelectMasterSlaveMode()
+    630                 2. If TIM4 is used as slave to other timers use the following functions:
+    631                    - TIM4_SelectInputTrigger()
+    632                    - TIM4_SelectSlaveMode()
+    633                    
+    634          @endverbatim
+    635            * @{
+    636            */
+    637          
+    638          /**
+    639            * @brief  Selects the TIM4 Input Trigger source.
+    640            * @param  TIM4_InputTriggerSource: Specifies Input Trigger source.
+    641            *          This parameter can be one of the following values:
+    642            *            @arg TIM4_TRGSelection_TIM5: TRIG Input source =  TIM5 TRIG Output
+    643            *            @arg TIM4_TRGSelection_TIM1: TRIG Input source =  TIM1 TRIG Output
+    644            *            @arg TIM4_TRGSelection_TIM3: TRIG Input source =  TIM3 TRIG Output
+    645            *            @arg TIM4_TRGSelection_TIM2: TRIG Input source =  TIM2 TRIG Output
+    646            * @retval None
+    647            */
+
+   \                                 In section .near_func.text, align 1
+    648          void TIM4_SelectInputTrigger(TIM4_TRGSelection_TypeDef TIM4_InputTriggerSource)
+    649          {
+   \                     TIM4_SelectInputTrigger:
+   \   000000 B7 ..        LD        S:?b0, A
+    650            uint8_t tmpsmcr = 0;
+    651          
+    652            /* Check the parameters */
+    653            assert_param(IS_TIM4_TRIGGER_SELECTION(TIM4_InputTriggerSource));
+    654          
+    655            tmpsmcr = TIM4->SMCR;
+   \   000002 C6 52E2      LD        A, L:0x52e2
+    656          
+    657            /* Select the Trigger Source */
+    658            tmpsmcr &= (uint8_t)(~TIM4_SMCR_TS);
+    659            tmpsmcr |= (uint8_t)TIM4_InputTriggerSource;
+    660          
+    661            TIM4->SMCR = (uint8_t)tmpsmcr;
+   \   000005 A4 8F        AND       A, #0x8f
+   \   000007 BA ..        OR        A, S:?b0
+   \   000009 C7 52E2      LD        L:0x52e2, A
+    662          }
+   \   00000C 81           RET
+    663          
+    664          /**
+    665            * @brief  Selects the TIM4 Trigger Output Mode.
+    666            * @param  TIM4_TRGOSource: Specifies the Trigger Output source.
+    667            *          This parameter can be one of the following values:
+    668            *            @arg TIM4_TRGOSource_Reset: Trigger Output source = Reset
+    669            *            @arg TIM4_TRGOSource_Enable: Trigger Output source = TIM4 is enabled
+    670            *            @arg TIM4_TRGOSource_Update: Trigger Output source = Update event
+    671            * @retval None
+    672            */
+
+   \                                 In section .near_func.text, align 1
+    673          void TIM4_SelectOutputTrigger(TIM4_TRGOSource_TypeDef TIM4_TRGOSource)
+    674          {
+   \                     TIM4_SelectOutputTrigger:
+   \   000000 B7 ..        LD        S:?b0, A
+    675            uint8_t tmpcr2 = 0;
+    676          
+    677            /* Check the parameters */
+    678            assert_param(IS_TIM4_TRGO_SOURCE(TIM4_TRGOSource));
+    679          
+    680            tmpcr2 = TIM4->CR2;
+   \   000002 C6 52E1      LD        A, L:0x52e1
+    681          
+    682            /* Reset the MMS Bits */
+    683            tmpcr2 &= (uint8_t)(~TIM4_CR2_MMS);
+    684          
+    685            /* Select the TRGO source */
+    686            tmpcr2 |=  (uint8_t)TIM4_TRGOSource;
+    687          
+    688            TIM4->CR2 = tmpcr2;
+   \   000005 A4 8F        AND       A, #0x8f
+   \   000007 BA ..        OR        A, S:?b0
+   \   000009 C7 52E1      LD        L:0x52e1, A
+    689          }
+   \   00000C 81           RET
+    690          
+    691          /**
+    692            * @brief  Selects the TIM4 Slave Mode.
+    693            * @param  TIM4_SlaveMode: Specifies the TIM4 Slave Mode.
+    694            *          This parameter can be one of the following values:
+    695            *            @arg TIM4_SlaveMode_Disable: Disable slave mode to clock the prescaler
+    696                                                      directly with the internal clock
+    697            *            @arg TIM4_SlaveMode_Reset: Slave Mode Selection  = Reset
+    698            *            @arg TIM4_SlaveMode_Gated: Slave Mode Selection  = Gated
+    699            *            @arg TIM4_SlaveMode_Trigger: Slave Mode Selection  = Trigger
+    700            *            @arg TIM4_SlaveMode_External1: Slave Mode Selection  = External 1  
+    701            * @retval None
+    702            */
+
+   \                                 In section .near_func.text, align 1
+    703          void TIM4_SelectSlaveMode(TIM4_SlaveMode_TypeDef TIM4_SlaveMode)
+    704          {
+   \                     TIM4_SelectSlaveMode:
+   \   000000 B7 ..        LD        S:?b0, A
+    705            uint8_t tmpsmcr = 0;
+    706          
+    707            /* Check the parameters */
+    708            assert_param(IS_TIM4_SLAVE_MODE(TIM4_SlaveMode));
+    709          
+    710            tmpsmcr = TIM4->SMCR;
+   \   000002 C6 52E2      LD        A, L:0x52e2
+    711          
+    712            /* Reset the SMS Bits */
+    713            tmpsmcr &= (uint8_t)(~TIM4_SMCR_SMS);
+    714          
+    715            /* Select the Slave Mode */
+    716            tmpsmcr |= (uint8_t)TIM4_SlaveMode;
+    717          
+    718            TIM4->SMCR = tmpsmcr;
+   \   000005 A4 F8        AND       A, #0xf8
+   \   000007 BA ..        OR        A, S:?b0
+   \   000009 C7 52E2      LD        L:0x52e2, A
+    719          }
+   \   00000C 81           RET
+    720          
+    721          /**
+    722            * @brief  Sets or Resets the TIM4 Master/Slave Mode.
+    723            * @param NewState: The new state of the synchronization between TIM4 and its slaves (through TRGO).
+    724            *          This parameter can be ENABLE or DISABLE
+    725            * @retval None
+    726            */
+
+   \                                 In section .near_func.text, align 1
+    727          void TIM4_SelectMasterSlaveMode(FunctionalState NewState)
+    728          {
+    729            /* Check the parameters */
+    730            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    731          
+    732            /* Set or Reset the MSM Bit */
+    733            if (NewState != DISABLE)
+   \                     TIM4_SelectMasterSlaveMode:
+   \   000000 4D           TNZ       A
+   \   000001 27 05        JREQ      L:??TIM4_SelectMasterSlaveMode_0
+    734            {
+    735              TIM4->SMCR |= TIM4_SMCR_MSM;
+   \   000003 721E 52E2    BSET      L:0x52e2, #0x7
+   \   000007 81           RET
+    736            }
+    737            else
+    738            {
+    739              TIM4->SMCR &= (uint8_t)(~TIM4_SMCR_MSM);
+   \                     ??TIM4_SelectMasterSlaveMode_0:
+   \   000008 721F 52E2    BRES      L:0x52e2, #0x7
+    740            }
+    741          }
+   \   00000C 81           RET
+    742          
+    743          /**
+    744            * @}
+    745            */ 
+    746          
+    747          /**
+    748            * @}
+    749            */ 
+    750            
+    751          /**
+    752            * @}
+    753            */
+    754          
+    755          /**
+    756            * @}
+    757            */
+    758          
+    759          /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      13  TIM4_ARRPreloadConfig
+       5  TIM4_ClearFlag
+       5  TIM4_ClearITPendingBit
+      13  TIM4_Cmd
+      17  TIM4_DMACmd
+      33  TIM4_DeInit
+       7  TIM4_GenerateEvent
+       4  TIM4_GetCounter
+      14  TIM4_GetFlagStatus
+      33  TIM4_GetITStatus
+       4  TIM4_GetPrescaler
+      17  TIM4_ITConfig
+       9  TIM4_InternalClockConfig
+      19  TIM4_PrescalerConfig
+      13  TIM4_SelectInputTrigger
+      13  TIM4_SelectMasterSlaveMode
+      14  TIM4_SelectOnePulseMode
+      13  TIM4_SelectOutputTrigger
+      13  TIM4_SelectSlaveMode
+       4  TIM4_SetAutoreload
+       4  TIM4_SetCounter
+      17  TIM4_TimeBaseInit
+      13  TIM4_UpdateDisableConfig
+      14  TIM4_UpdateRequestConfig
+
+ 
+ 311 bytes in section .near_func.text
+ 
+ 311 bytes of CODE memory
+
+Errors: none
+Warnings: none

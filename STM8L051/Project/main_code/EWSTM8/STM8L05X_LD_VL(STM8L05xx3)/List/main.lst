@@ -1,0 +1,3595 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V2.10.2.149 for STM8                 16/Jul/2015  14:37:01
+# Copyright 2010-2014 IAR Systems AB.
+#
+#    Source file  =  
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\main.c
+#    Command line =  
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\main.c
+#        -e -Ohz --debug --code_model small --data_model medium -o
+#        "C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\Obj\"
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0\stm8\LIB\dlstm8smn.h" -D USE_STM8L1526_EVAL -D STM8L05X_LD_VL -lC
+#        "C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\List\"
+#        -lA
+#        "C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\List\"
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\..\..\Libraries\STM8L15x_StdPeriph_Driver\inc\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\STM8_EVAL\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\STM8_EVAL\STM8L1526_EVAL\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\STM8_EVAL\Common\
+#        -I
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\..\..\..\Utilities\Misc\
+#        --require_prototypes --vregs 16
+#    List file    =  
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\List\main.lst
+#    Object file  =  
+#        C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\EWSTM8\STM8L05X_LD_VL(STM8L05xx3)\Obj\main.o
+#
+###############################################################################
+
+C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\main.c
+      1          /**                               **
+      2                  433Mhz CC1101 Receiver
+      3                       One_Line_OPT
+      4                       Xu jiawei
+      5          **                                **/
+      6          
+      7          #include "stm8l15x.h"
+      8          #include "stm8l15x_clk.h"
+      9          #include "stm8l15x_gpio.h" 
+     10          #include "cc1101.h"
+     11          
+     12          //#include  <math.h>
+     13          
+     14          //设备ID 为     
+     15          #define  DEVICE_ID_6  0x30
+     16          #define  DEVICE_ID_5  0x30
+     17          #define  DEVICE_ID_4  0x30
+     18          #define  DEVICE_ID_3  0x30
+     19          #define  DEVICE_ID_2  0x30
+     20          #define  DEVICE_ID_1  0x30
+     21          
+     22          #define  LINE1_SN_1  0x00
+     23          #define  LINE1_SN_2  0x00
+     24          #define  LINE1_SN_3  0x00
+     25          #define  LINE1_SN_4  0x00
+     26          #define  LINE1_SN_5  0x00
+     27          #define  LINE1_SN_6  0x01
+     28          
+     29          
+     30          
+     31          #define  DEVICE_TYPE  0x02  //单路执行器设备类型码
+     32          
+     33          #define  AI           0x10
+     34          #define  AO           0x30
+     35          #define  BI           0x50
+     36          #define  BO           0x70
+     37          #define  ABIO_TOOGLE  0x20
+     38          
+     39          
+     40          #define  A_LINE1      0x11
+     41          #define  B_LINE1      0x12
+     42          
+     43          #define  LINE_1       0x16
+     44          
+     45          #define  ABIO_TOOGLE_LINE1 0x18
+     46          
+     47          #define  INT8U    unsigned char
+     48          #define  INT16U   unsigned int
+     49          #define  uclong   unsigned long
+     50          #define  ON       0x11
+     51          #define  OFF      0x10
+     52          
+     53          #define  FLAG_ON                      0x11
+     54          #define  RECEIVE_DATA_LENGTH          0x21
+     55          
+     56          #define  FINDINFLASH_FAIL             0x77      //查找ID失败返回值
+     57          #define  MAXLEARNNUM                  10        //ID最大学习数量
+     58          
+     59          #define  IDSTARTADDRESS               0x1010    //第一个ID在Flash中记录的开始位置
+     60          #define  IFFIRSTPOWERNUMADRESS        0x1002    //判断是否第一次开机的标识数在flash中位置
+     61          #define  IDCOUNTADD                   0x1003    //已经学习到的ID的数量
+     62          #define  NEWIDADDRESSINFLASH_PART_1   0x1005    //新ID在Flash中记录的开始位置需要保存
+     63          #define  NEWIDADDRESSINFLASH_PART_2   0x1006  
+     64          
+     65          
+     66          /***********  LED IO口宏定义  ************/
+     67          #define  LED1_GREEN_PORT   GPIOB      //
+     68          #define  LED1_BLUE_PORT    GPIOB      //
+     69          #define  LED1_RED_PORT     GPIOB      //
+     70          #define  LED1_GREEN_PIN    GPIO_Pin_0
+     71          #define  LED1_BLUE_PIN     GPIO_Pin_0
+     72          #define  LED1_RED_PIN      GPIO_Pin_0
+     73          
+     74          #define  LED1_GREEN        GPIO_SetBits(LED1_GREEN_PORT,LED1_GREEN_PIN);   
+     75          #define  LED1_BLUE         GPIO_SetBits(LED1_BLUE_PORT ,LED1_BLUE_PIN );    
+     76          #define  LED1_RED          GPIO_SetBits(LED1_RED_PORT  ,LED1_RED_PIN  );
+     77          
+     78          /***********  按键 IO口 宏定义  ************/
+     79          #define  KEY1_PORT         GPIOC
+     80          #define  KEY1_PIN          GPIO_Pin_6
+     81          #define  KEY1_INPUT        GPIO_ReadInputDataBit(KEY1_PORT,KEY1_PIN)    //按键 
+     82          
+     83          /***********  继电器操作 宏定义  ************/
+     84          #define  LINE1_PORT        GPIOC
+     85          #define  LINE1_PIN         GPIO_Pin_4   
+     86          /* 继电器操作 */
+     87          #define  OPEN_LINE1        GPIO_SetBits  (LINE1_PORT,  LINE1_PIN)
+     88          #define  CLOSE_LINE1       GPIO_ResetBits(LINE1_PORT,  LINE1_PIN)
+     89          #define  TOOGLE_LINE1      GPIO_ToggleBits(LINE1_PORT, LINE1_PIN);
+     90          
+     91          /* 函数声明区域 */
+     92          
+     93          
+     94          INT8U  halRfReceivePacket(INT8U *rxBuffer, INT8U *length);
+     95          void   halRfSendPacket(INT8U *txBuffer, INT8U size);
+     96          void   delay(uclong s);
+     97          void   InitAllGpio(void);
+     98          void   InitRegister(void);
+     99          void   FirstPower(void);
+    100          INT8U  FindIdInFlash(INT8U ID_1,INT8U ID_2,INT8U ID_3,INT8U ID_4);
+    101          void   ReadIdInFlash(void);
+    102          void   WriteIdInFlash(INT8U ID_Part1,INT8U ID_Part2,INT8U ID_Part3,INT8U ID_Part4);
+    103          void   ClearFlash(void);
+    104          void   Led1_Off(void);
+    105          void   Key1_Function(void);
+    106          void   Radio_Recive(void);
+    107          void   Auto_Exit_LearnMode_Function(void);
+    108          void   LearnMode_Function(void);
+    109          void   WriteKeyOperationInFlash(INT8U ABIO_Line,INT8U Adress);
+    110          void   SaveInfoInFlash(void);
+    111          INT8U  CalculateRssi(INT8U RSSI_dec);
+    112          INT8U   CommonMode_OperateLine(INT8U Key_num,INT8U AdressOfData);
+    113          void   timer2_delay(uclong  time);
+    114          void   Reply_RequestFlashData(INT8U AdressOfData,INT8U Master_Id_1,INT8U Master_Id_2,INT8U Master_Id_3,INT8U Master_Id_4);
+    115          void   ControlByAirLearn_NewWriteInFlash(INT8U data1,INT8U data2,INT8U data3,INT8U data4,INT8U data5,INT8U Line ,INT8U LearnedIdNum);
+    116          void   UpdateDatasAdressInFlash(INT8U NumOfDeleteData); 
+    117          void   Broadcast_info(void);
+    118          
+    119          INT8U   radio_12_function(void);
+    120          void    radio_10_function(void);
+    121          void    radio_2_function(void);
+    122          void    radio_3_function(void);
+    123          INT8U   radio_9_function(void);
+    124          void    radio_0_function(void);
+    125          void    radio_7_function(void);
+    126          void    reply_broadcast(void);
+    127          
+    128          /***********  系统参数定义区  **********/
+    129          
+    130          
+
+   \                                 In section .near.data, align 1
+    131          INT8U  max_radio_length = RECEIVE_DATA_LENGTH;     //报文接收长度
+   \                     max_radio_length:
+   \   000000 21           DC8 33
+
+   \                                 In section .near.bss, align 1
+    132          INT8U  receiveflag = 0;                       //报文接收中断标识
+   \                     receiveflag:
+   \   000000              DS8 1
+
+   \                                 In section .near.bss, align 1
+    133          INT8U  firstpower  = 0;                       //第一次开机标识
+   \                     firstpower:
+   \   000000              DS8 1
+    134          
+
+   \                                 In section .near.bss, align 1
+    135          INT8U  Key1_InterruptPushflag  = 0;           //按键1  中断标识
+   \                     Key1_InterruptPushflag:
+   \   000000              DS8 1
+
+   \                                 In section .near.bss, align 1
+    136          INT8U  Key1_Short_Pushed       = 0;           //确认按下KEY1--短按 标识
+   \                     Key1_Short_Pushed:
+   \   000000              DS8 1
+
+   \                                 In section .near.bss, align 1
+    137          uclong key1_time_count         ;              //按键1 计时
+   \                     key1_time_count:
+   \   000000              DS8 4
+    138          
+
+   \                                 In section .near.data, align 1
+    139          INT8U  learn_mode          = OFF;             //判断是否处于学习模式的标识
+   \                     learn_mode:
+   \   000000 10           DC8 16
+    140          
+
+   \                                 In section .near.bss, align 1
+    141          uclong auto_exit_time      = 0;               //自动退出学习模式 计时
+   \                     auto_exit_time:
+   \   000000              DS8 4
+
+   \                                 In section .near.bss, align 1
+    142          INT8U  led_blink_time      = 0;               //LED闪烁计时
+   \                     led_blink_time:
+   \   000000              DS8 1
+
+   \                                 In section .near.bss, align 1
+    143          uclong WaitForConfirm_time = 0;               //学习模式确认时间计时
+   \                     WaitForConfirm_time:
+   \   000000              DS8 4
+
+   \                                 In section .near.data, align 1
+    144          INT8U  Choose_Line         = 1;               //学习模式下通道选择 --  1：Line1  2：Line2
+   \                     Choose_Line:
+   \   000000 01           DC8 1
+
+   \                                 In section .near.bss, align 1
+    145          uclong timer2_delay_time   = 0;
+   \                     timer2_delay_time:
+   \   000000              DS8 4
+    146          
+
+   \                                 In section .near.bss, align 1
+    147          INT8U  Public_learned_ID_num = 0;             //已经学习到的ID的数量
+   \                     Public_learned_ID_num:
+   \   000000              DS8 1
+
+   \                                 In section .near.data, align 1
+    148          INT16U IdStartAddress = IDSTARTADDRESS;       //新开关的ID将被记录到Flash中，IdStartAddres为开始存储的起始地址
+   \                     IdStartAddress:
+   \   000000 1010         DC16 4112
+    149          
+    150          //接收报文函数中使用
+
+   \                                 In section .near.bss, align 1
+    151          INT8U Radio_Data[RECEIVE_DATA_LENGTH];                         //存放接收到的数据
+   \                     Radio_Data:
+   \   000000              DS8 33
+    152          //INT8U receive_data_leng = RECEIVE_DATA_LENGTH;               //定义接收报文长度 最大值  
+
+   \                                 In section .near.bss, align 1
+    153          INT8U receive_radio_length     = 0;           //接收报文函数返回的报文长度
+   \                     receive_radio_length:
+   \   000000              DS8 1
+
+   \                                 In section .near.bss, align 1
+    154          INT8U FindIdInFlash_return_num = 0;           //接收FindIdInFlash（）函数的返回值，返回值为 ID_num
+   \                     FindIdInFlash_return_num:
+   \   000000              DS8 1
+
+   \                                 In section .near.bss, align 1
+    155          INT8U IdNum                    = 0;
+   \                     IdNum:
+   \   000000              DS8 1
+
+   \                                 In section .near.data, align 1
+    156          INT8U LearnModeWaitForConfirm  = OFF;         //学习模式中等待确认
+   \                     LearnModeWaitForConfirm:
+   \   000000 10           DC8 16
+    157          
+
+   \                                 In section .near.data, align 1
+    158          INT8U  Radio_Can_Operated  = 1;               //接收到报文之后已经执行了操作
+   \                     Radio_Can_Operated:
+   \   000000 01           DC8 1
+
+   \                                 In section .near.bss, align 1
+    159          uclong timer3_Operate_time = 0;               //计算开关送两个信号的处理时间
+   \                     timer3_Operate_time:
+   \   000000              DS8 4
+    160          
+
+   \                                 In section .near.data, align 1
+    161          INT8U  Return_FindInFlash = FINDINFLASH_FAIL;
+   \                     Return_FindInFlash:
+   \   000000 77           DC8 119
+
+   \                                 In section .near.bss, align 1
+    162          INT8U  led_flash = 0;
+   \                     led_flash:
+   \   000000              DS8 1
+
+   \                                 In section .near.bss, align 1
+    163          INT8U  check_key1 = 0;
+   \                     check_key1:
+   \   000000              DS8 1
+
+   \                                 In section .near.bss, align 1
+    164          INT8U  clear_pll_clock = 0;   //接收到第一个报文之后的30ms，矫正时钟。
+   \                     clear_pll_clock:
+   \   000000              DS8 1
+    165          
+    166          
+    167          /* 无线报文结构体 */
+    168          struct Radio{          
+    169            INT8U Radio_type;                        //设备类型 -- 0x7(双路执行器)  0x3(远程学习接口)
+    170            INT8U Id_part_1;                          //ID
+    171            INT8U Id_part_2;
+    172            INT8U Id_part_3;
+    173            INT8U Id_part_4;
+    174            INT8U status;                             //报文状态
+    175            INT8U Data;                               //数据
+    176          };
+
+   \                                 In section .near.bss, align 1
+    177          struct Radio AllRadio[MAXLEARNNUM];         //初始化全局变量，用于将Flash中数据移植到本地
+   \                     AllRadio:
+   \   000000              DS8 70
+    178          
+    179          /* 开关按键功能结构体 */     
+    180          struct ABIO{          
+    181            INT8U AI_Line1;                       
+    182            INT8U AO_Line1;                         
+    183            INT8U BI_Line1;
+    184            INT8U BO_Line1;
+    185            INT8U TOOGLE_Line1; 
+    186          };
+
+   \                                 In section .near.bss, align 1
+    187          struct ABIO ABIO_Function[MAXLEARNNUM];    
+   \                     ABIO_Function:
+   \   000000              DS8 50
+    188          
+    189          
+
+   \                                 In section .near_func.text, align 1
+    190          void delay(uclong  s)
+    191          {
+   \                     delay:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 CD ....      CALL      L:?push_l3
+   \   000006 CD ....      CALL      L:?mov_l2_l0
+    192              uclong i;
+    193              for(i=0; i<s; i++)
+   \   000009 5F           CLRW      X
+   \   00000A BF ..        LDW       S:?w7, X
+   \   00000C BF ..        LDW       S:?w6, X
+   \   00000E 20 06        JRA       L:??delay_0
+    194                IWDG_ReloadCounter();  
+   \                     ??delay_1:
+   \   000010 CD ....      CALL      L:IWDG_ReloadCounter
+   \   000013 CD ....      CALL      L:?inc32_l3_l3
+   \                     ??delay_0:
+   \   000016 CD ....      CALL      L:?mov_l0_l3
+   \   000019 CD ....      CALL      L:?mov_l1_l2
+   \   00001C CD ....      CALL      L:?ucmp32_c_l0_l1
+   \   00001F 25 EF        JRC       L:??delay_1
+    195              for(i=0; i<s; i++);
+   \   000021 5F           CLRW      X
+   \   000022 BF ..        LDW       S:?w1, X
+   \   000024 BF ..        LDW       S:?w0, X
+   \   000026 20 03        JRA       L:??delay_2
+   \                     ??delay_3:
+   \   000028 CD ....      CALL      L:?inc32_l0_l0
+   \                     ??delay_2:
+   \   00002B CD ....      CALL      L:?ucmp32_c_l0_l1
+   \   00002E 25 F8        JRC       L:??delay_3
+    196                IWDG_ReloadCounter();   
+   \   000030 CD ....      CALL      L:IWDG_ReloadCounter
+    197          }
+   \   000033 CC ....      JP        L:?epilogue_l2_l3
+    198          
+    199          
+    200          /**
+    201          @function：Timer2 计时    
+    202          总计时为 1ms * time 
+    203          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    204          void timer2_delay(uclong  time)  
+    205          {
+   \                     timer2_delay:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 CD ....      CALL      L:?push_w6
+   \   000006 CD ....      CALL      L:?mov_l2_l0
+    206              uclong error_out = 0;
+    207              timer2_delay_time  = 0;    //计数器清空
+   \   000009 5F           CLRW      X
+   \   00000A CF ....      LDW       L:timer2_delay_time, X
+   \   00000D CF ....      LDW       L:timer2_delay_time + 2, X
+    208              TIM2_Cmd(ENABLE);
+   \   000010 A6 01        LD        A, #0x1
+   \   000012 CD ....      CALL      L:TIM2_Cmd
+   \   000015 AE EA61      LDW       X, #0xea61
+   \   000018 BF ..        LDW       S:?w6, X
+    209              do
+    210              {
+    211                  IWDG_ReloadCounter();    //喂狗
+   \                     ??timer2_delay_0:
+   \   00001A CD ....      CALL      L:IWDG_ReloadCounter
+    212                  error_out++;
+    213                  if(error_out > 60000)
+   \   00001D BE ..        LDW       X, S:?w6
+   \   00001F 5A           DECW      X
+   \   000020 BF ..        LDW       S:?w6, X
+   \   000022 27 0E        JREQ      L:??timer2_delay_1
+    214                  { break;}
+    215              }while(timer2_delay_time  < time);
+   \   000024 AE ....      LDW       X, #timer2_delay_time
+   \   000027 CD ....      CALL      L:?load32_l0_0x
+   \   00002A CD ....      CALL      L:?mov_l1_l2
+   \   00002D CD ....      CALL      L:?ucmp32_c_l0_l1
+   \   000030 25 E8        JRC       L:??timer2_delay_0
+    216                
+    217              TIM2_Cmd(DISABLE);
+   \                     ??timer2_delay_1:
+   \   000032 4F           CLR       A
+   \   000033 CD ....      CALL      L:TIM2_Cmd
+    218              
+    219              timer2_delay_time  = 0;
+   \   000036 5F           CLRW      X
+   \   000037 CF ....      LDW       L:timer2_delay_time, X
+   \   00003A CF ....      LDW       L:timer2_delay_time + 2, X
+    220          }
+   \   00003D CC ....      JP        L:?epilogue_l2_w6
+    221          
+    222          /**
+    223          @function：关闭LED1 
+    224          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    225          void  Led1_Off(void)
+    226          {
+    227              GPIO_ResetBits(LED1_GREEN_PORT,LED1_GREEN_PIN);
+   \                     Led1_Off:
+   \   000000 CD ....      CALL      L:?Subroutine4
+    228              GPIO_ResetBits(LED1_BLUE_PORT,LED1_BLUE_PIN); 
+   \                     ??CrossCallReturnLabel_12:
+   \   000003 CD ....      CALL      L:?Subroutine4
+    229              GPIO_ResetBits(LED1_RED_PORT ,LED1_RED_PIN);
+   \                     ??CrossCallReturnLabel_13:
+   \   000006 A6 01        LD        A, #0x1
+   \   000008 AE 5005      LDW       X, #0x5005
+   \   00000B CC ....      JP        L:GPIO_ResetBits
+    230          }
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine4:
+   \   000000 CD ....      CALL      L:?Subroutine48
+   \                     ??CrossCallReturnLabel_109:
+   \   000003 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine48:
+   \   000000 A6 01        LD        A, #0x1
+   \   000002 AE 5005      LDW       X, #0x5005
+   \   000005 CC ....      JP        L:GPIO_ResetBits
+    231          
+    232          /**
+    233          @function：计算RSSI值 
+    234          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    235          INT8U CalculateRssi(INT8U RSSI_dec)
+    236          {
+    237          return 0;
+   \                     CalculateRssi:
+   \   000000 4F           CLR       A
+   \   000001 81           RET
+    238          }
+    239          
+    240          /**
+    241          @function：初始化IO口  
+    242          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    243          void InitAllGpio(void)  
+    244          { 
+    245              /*SPI初始化*/
+    246              GPIO_Init(MISO_PORT, MISO_PIN,GPIO_Mode_In_PU_No_IT);           // MISO_PIN        
+   \                     InitAllGpio:
+   \   000000 35 40 ....   MOV       S:?b0, #0x40
+   \   000004 A6 10        LD        A, #0x10
+   \   000006 CD ....      CALL      L:?Subroutine1
+   \                     ??CrossCallReturnLabel_2:
+   \   000009 A6 40        LD        A, #0x40
+   \   00000B CD ....      CALL      L:?Subroutine1
+   \                     ??CrossCallReturnLabel_3:
+   \   00000E A6 20        LD        A, #0x20
+   \   000010 CD ....      CALL      L:?Subroutine1
+    247              GPIO_Init(MOSI_PORT, MOSI_PIN,GPIO_Mode_Out_PP_High_Fast);        // MOSI_PIN
+    248              GPIO_Init(SCK_PORT,  SCK_PIN,GPIO_Mode_Out_PP_High_Fast);         // SCK_PIN
+    249              GPIO_Init(CSN_PORT,  CSN_PIN,GPIO_Mode_Out_PP_High_Fast);         // CSN_PIN
+   \                     ??CrossCallReturnLabel_4:
+   \   000013 A6 08        LD        A, #0x8
+   \   000015 CD ....      CALL      L:?Subroutine5
+    250              /*GDO0初始化*/
+    251              GPIO_Init(GPIOB, GPIO_Pin_2,GPIO_Mode_In_FL_IT);
+   \                     ??CrossCallReturnLabel_14:
+   \   000018 35 20 ....   MOV       S:?b0, #0x20
+   \   00001C A6 04        LD        A, #0x4
+   \   00001E CD ....      CALL      L:?Subroutine5
+    252              EXTI_SetPinSensitivity(EXTI_Pin_2, EXTI_Trigger_Falling);
+   \                     ??CrossCallReturnLabel_15:
+   \   000021 35 02 ....   MOV       S:?b0, #0x2
+   \   000025 A6 04        LD        A, #0x4
+   \   000027 CD ....      CALL      L:EXTI_SetPinSensitivity
+    253              /*按键初始化*/
+    254              GPIO_Init(KEY1_PORT, KEY1_PIN,GPIO_Mode_In_FL_IT);                                  
+   \   00002A 35 20 ....   MOV       S:?b0, #0x20
+   \   00002E A6 40        LD        A, #0x40
+   \   000030 AE 500A      LDW       X, #0x500a
+   \   000033 CD ....      CALL      L:GPIO_Init
+    255              EXTI_SetPinSensitivity(EXTI_Pin_6, EXTI_Trigger_Falling);     //按键中断      
+   \   000036 35 02 ....   MOV       S:?b0, #0x2
+   \   00003A A6 14        LD        A, #0x14
+   \   00003C CD ....      CALL      L:EXTI_SetPinSensitivity
+    256              /*ED的IO初始化*/
+    257              //LED1
+    258              GPIO_Init(LED1_GREEN_PORT, LED1_GREEN_PIN,GPIO_Mode_Out_PP_Low_Slow);      
+   \   00003F 35 C0 ....   MOV       S:?b0, #0xc0
+   \   000043 A6 01        LD        A, #0x1
+   \   000045 CD ....      CALL      L:?Subroutine5
+    259              GPIO_ResetBits(LED1_GREEN_PORT, LED1_GREEN_PIN);
+   \                     ??CrossCallReturnLabel_16:
+   \   000048 CD ....      CALL      L:?Subroutine0
+    260              GPIO_Init(LED1_RED_PORT, LED1_RED_PIN,GPIO_Mode_Out_PP_Low_Slow);
+    261              GPIO_ResetBits(LED1_RED_PORT, LED1_RED_PIN);
+   \                     ??CrossCallReturnLabel_0:
+   \   00004B CD ....      CALL      L:?Subroutine0
+    262              GPIO_Init(LED1_BLUE_PORT, LED1_BLUE_PIN,GPIO_Mode_Out_PP_Low_Slow); 
+    263              GPIO_ResetBits(LED1_BLUE_PORT, LED1_BLUE_PIN);
+   \                     ??CrossCallReturnLabel_1:
+   \   00004E CD ....      CALL      L:?Subroutine4
+    264              /*继电器IO初始化*/
+    265              GPIO_Init(LINE1_PORT,LINE1_PIN,GPIO_Mode_Out_PP_High_Slow);
+   \                     ??CrossCallReturnLabel_11:
+   \   000051 35 D0 ....   MOV       S:?b0, #0xd0
+   \   000055 CD ....      CALL      L:?Subroutine29
+   \                     ??CrossCallReturnLabel_71:
+   \   000058 CD ....      CALL      L:GPIO_Init
+    266              GPIO_ResetBits(LINE1_PORT,LINE1_PIN);  
+   \   00005B CD ....      CALL      L:?Subroutine29
+   \                     ??CrossCallReturnLabel_72:
+   \   00005E CC ....      JP        L:GPIO_ResetBits
+    267              
+    268          }
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine29:
+   \   000000 A6 10        LD        A, #0x10
+   \   000002 AE 500A      LDW       X, #0x500a
+   \   000005 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine5:
+   \   000000 CD ....      CALL      L:?Subroutine56
+   \                     ??CrossCallReturnLabel_122:
+   \   000003 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine1:
+   \   000000 CD ....      CALL      L:?Subroutine56
+   \                     ??CrossCallReturnLabel_121:
+   \   000003 35 F0 ....   MOV       S:?b0, #0xf0
+   \   000007 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   000000 CD ....      CALL      L:?Subroutine48
+   \                     ??CrossCallReturnLabel_110:
+   \   000003 35 C0 ....   MOV       S:?b0, #0xc0
+   \   000007 A6 01        LD        A, #0x1
+   \   000009 CD ....      CALL      L:?Subroutine56
+   \                     ??CrossCallReturnLabel_120:
+   \   00000C 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine56:
+   \   000000 AE 5005      LDW       X, #0x5005
+   \   000003 CC ....      JP        L:GPIO_Init
+    269          
+    270          /**
+    271          @function：配置CLK 及Timer4、2、3定时器 & 看门狗 
+    272          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine59:
+   \   000000 BF ..        LDW       S:?w1, X
+   \   000002 5F           CLRW      X
+   \   000003 BF ..        LDW       S:?w0, X
+   \   000005 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    273          void InitRegister(void)
+    274          {  
+    275               /** 配置内部时钟 **/
+    276               CLK_SYSCLKSourceConfig(CLK_SYSCLKSource_HSI);                //配置内部时钟
+   \                     InitRegister:
+   \   000000 A6 01        LD        A, #0x1
+   \   000002 CD ....      CALL      L:CLK_SYSCLKSourceConfig
+    277               CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_4);                        //时钟预分频
+   \   000005 A6 02        LD        A, #0x2
+   \   000007 CD ....      CALL      L:CLK_SYSCLKDivConfig
+    278               /** 配置Timer4 **/ 
+    279               CLK_PeripheralClockConfig(CLK_Peripheral_TIM4, ENABLE);
+   \   00000A 35 01 ....   MOV       S:?b0, #0x1
+   \   00000E A6 02        LD        A, #0x2
+   \   000010 CD ....      CALL      L:CLK_PeripheralClockConfig
+    280               TIM4_TimeBaseInit(TIM4_Prescaler_512, 50);                 //6.4ms中断      
+   \   000013 35 32 ....   MOV       S:?b0, #0x32
+   \   000017 A6 09        LD        A, #0x9
+   \   000019 CD ....      CALL      L:TIM4_TimeBaseInit
+    281               TIM4_ClearFlag(TIM4_FLAG_Update);
+   \   00001C A6 01        LD        A, #0x1
+   \   00001E CD ....      CALL      L:TIM4_ClearFlag
+    282               TIM4_ITConfig(TIM4_IT_Update, ENABLE);
+   \   000021 CD ....      CALL      L:?Subroutine42
+   \                     ??CrossCallReturnLabel_95:
+   \   000024 CD ....      CALL      L:TIM4_ITConfig
+    283               /** 配置Timer2 **/ 
+    284               CLK_PeripheralClockConfig(CLK_Peripheral_TIM2, ENABLE);
+   \   000027 35 01 ....   MOV       S:?b0, #0x1
+   \   00002B 4F           CLR       A
+   \   00002C CD ....      CALL      L:CLK_PeripheralClockConfig
+    285               TIM2_TimeBaseInit(TIM2_Prescaler_4,TIM2_CounterMode_Up, 1000);   //1ms
+   \   00002F AE 03E8      LDW       X, #0x3e8
+   \   000032 3F ..        CLR       S:?b0
+   \   000034 A6 02        LD        A, #0x2
+   \   000036 CD ....      CALL      L:TIM2_TimeBaseInit
+    286               TIM2_ClearFlag(TIM2_FLAG_Update);
+   \   000039 5F           CLRW      X
+   \   00003A 5C           INCW      X
+   \   00003B CD ....      CALL      L:TIM2_ClearFlag
+    287               TIM2_ITConfig(TIM2_IT_Update, ENABLE);            
+   \   00003E CD ....      CALL      L:?Subroutine42
+   \                     ??CrossCallReturnLabel_96:
+   \   000041 CD ....      CALL      L:TIM2_ITConfig
+    288               TIM2_Cmd(ENABLE);     
+   \   000044 A6 01        LD        A, #0x1
+   \   000046 CD ....      CALL      L:TIM2_Cmd
+    289               /** 配置Timer3 **/ 
+    290               CLK_PeripheralClockConfig(CLK_Peripheral_TIM3, ENABLE);
+   \   000049 CD ....      CALL      L:?Subroutine42
+   \                     ??CrossCallReturnLabel_97:
+   \   00004C CD ....      CALL      L:CLK_PeripheralClockConfig
+    291               TIM3_TimeBaseInit(TIM3_Prescaler_32,TIM3_CounterMode_Up, 200);  //1.6ms  参数300
+   \   00004F AE 00C8      LDW       X, #0xc8
+   \   000052 3F ..        CLR       S:?b0
+   \   000054 A6 05        LD        A, #0x5
+   \   000056 CD ....      CALL      L:TIM3_TimeBaseInit
+    292               TIM3_ClearFlag(TIM3_FLAG_Update);
+   \   000059 5F           CLRW      X
+   \   00005A 5C           INCW      X
+   \   00005B CD ....      CALL      L:TIM3_ClearFlag
+    293               TIM3_ITConfig(TIM3_IT_Update, ENABLE);       
+   \   00005E CD ....      CALL      L:?Subroutine42
+   \                     ??CrossCallReturnLabel_98:
+   \   000061 CD ....      CALL      L:TIM3_ITConfig
+    294               /** 配置看门狗 **/   
+    295               IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);    //16.384ms
+   \   000064 A6 55        LD        A, #0x55
+   \   000066 CD ....      CALL      L:IWDG_WriteAccessCmd
+    296               IWDG_SetPrescaler(IWDG_Prescaler_256);
+   \   000069 A6 06        LD        A, #0x6
+   \   00006B CD ....      CALL      L:IWDG_SetPrescaler
+    297               IWDG_SetReload(0xFE);
+   \   00006E A6 FE        LD        A, #0xfe
+   \   000070 CD ....      CALL      L:IWDG_SetReload
+    298               IWDG_ReloadCounter();
+   \   000073 CD ....      CALL      L:IWDG_ReloadCounter
+    299          
+    300               /**  RTC **/
+    301               CLK_RTCClockConfig(CLK_RTCCLKSource_HSI, CLK_RTCCLKDiv_16);    //3.2s
+   \   000076 35 80 ....   MOV       S:?b0, #0x80
+   \   00007A A6 02        LD        A, #0x2
+   \   00007C CD ....      CALL      L:CLK_RTCClockConfig
+    302               delay(9000);
+   \   00007F AE 2328      LDW       X, #0x2328
+   \   000082 CD ....      CALL      L:?Subroutine12
+    303               CLK_PeripheralClockConfig(CLK_Peripheral_RTC, ENABLE);
+   \                     ??CrossCallReturnLabel_36:
+   \   000085 35 01 ....   MOV       S:?b0, #0x1
+   \   000089 A6 12        LD        A, #0x12
+   \   00008B CD ....      CALL      L:CLK_PeripheralClockConfig
+    304               RTC_WakeUpClockConfig(RTC_WakeUpClock_RTCCLK_Div16);
+   \   00008E 4F           CLR       A
+   \   00008F CD ....      CALL      L:RTC_WakeUpClockConfig
+    305               RTC_ITConfig(RTC_IT_WUT, ENABLE);
+   \   000092 A6 01        LD        A, #0x1
+   \   000094 AE 0040      LDW       X, #0x40
+   \   000097 CD ....      CALL      L:RTC_ITConfig
+    306               RTC_SetWakeUpCounter(50000);
+   \   00009A AE C350      LDW       X, #0xc350
+   \   00009D CD ....      CALL      L:RTC_SetWakeUpCounter
+    307               RTC_WakeUpCmd(ENABLE);
+   \   0000A0 A6 01        LD        A, #0x1
+   \   0000A2 CC ....      JP        L:RTC_WakeUpCmd
+    308              
+    309          }
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine42:
+   \   000000 35 01 ....   MOV       S:?b0, #0x1
+   \   000004 A6 01        LD        A, #0x1
+   \   000006 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine12:
+   \   000000 CD ....      CALL      L:?Subroutine59
+   \                     ??CrossCallReturnLabel_128:
+   \   000003 CC ....      JP        L:delay
+    310          
+    311          
+    312          /************  接收数据包 ******************/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine65_0:
+   \   000000 5C           INCW      X
+   \   000001 BF ..        LDW       S:?w1, X
+   \   000003 CC ....      JP        L:timer2_delay
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    313          INT8U halRfReceivePacket(INT8U *rxBuffer, INT8U *length) 
+    314          {
+   \                     halRfReceivePacket:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 3B ....      PUSH      S:?b12
+   \   000006 52 02        SUB       SP, #0x2
+   \   000008 BF ..        LDW       S:?w5, X
+   \   00000A 90BF ..      LDW       S:?w4, Y
+    315              INT8U status[2];
+    316              INT8U packetLength;    
+    317              halSpiStrobe(0x34);                    //进入接收状态
+   \   00000D A6 34        LD        A, #0x34
+   \   00000F CD ....      CALL      L:halSpiStrobe
+    318              timer2_delay(2);                            
+   \   000012 5F           CLRW      X
+   \   000013 BF ..        LDW       S:?w0, X
+   \   000015 5C           INCW      X
+   \   000016 CD ....      CALL      L:??Subroutine65_0
+    319              if ((halSpiReadStatus(0x3B) & 0x7F) )  
+   \                     ??CrossCallReturnLabel_141:
+   \   000019 A6 3B        LD        A, #0x3b
+   \   00001B CD ....      CALL      L:halSpiReadStatus
+   \   00001E A5 7F        BCP       A, #0x7f
+   \   000020 27 4A        JREQ      L:??halRfReceivePacket_0
+    320              {         
+    321                  packetLength = halSpiReadReg(0x3F);
+   \   000022 A6 3F        LD        A, #0x3f
+   \   000024 CD ....      CALL      L:halSpiReadReg
+   \   000027 B7 ..        LD        S:?b12, A
+    322                  if (packetLength <= *length+1)       
+   \   000029 92C6 ..      LD        A, [S:?w4.w]
+   \   00002C 5F           CLRW      X
+   \   00002D 97           LD        XL, A
+   \   00002E 5C           INCW      X
+   \   00002F 9093         LDW       Y, X
+   \   000031 5F           CLRW      X
+   \   000032 41           EXG       A, XL
+   \   000033 B6 ..        LD        A, S:?b12
+   \   000035 41           EXG       A, XL
+   \   000036 BF ..        LDW       S:?w0, X
+   \   000038 93           LDW       X, Y
+   \   000039 B3 ..        CPW       X, S:?w0
+   \   00003B 2F 2A        JRSLT     L:??halRfReceivePacket_1
+    323                  {
+    324                      halSpiReadBurstReg(0x3F, rxBuffer, packetLength);  //+1 是为了获取RSSI值
+   \   00003D 45 .. ..     MOV       S:?b0, S:?b12
+   \   000040 BE ..        LDW       X, S:?w5
+   \   000042 A6 3F        LD        A, #0x3f
+   \   000044 CD ....      CALL      L:halSpiReadBurstReg
+    325                      *length = packetLength;				
+   \   000047 B6 ..        LD        A, S:?b12
+   \   000049 92C7 ..      LD        [S:?w4.w], A
+    326                      halSpiReadBurstReg(0x3F, status, 2);  //读出CRC校验位	
+   \   00004C 35 02 ....   MOV       S:?b0, #0x2
+   \   000050 96           LDW       X, SP
+   \   000051 5C           INCW      X
+   \   000052 A6 3F        LD        A, #0x3f
+   \   000054 CD ....      CALL      L:halSpiReadBurstReg
+    327                      halSpiStrobe(0x3A);	                  //清洗接收缓冲区           
+   \   000057 A6 3A        LD        A, #0x3a
+   \   000059 CD ....      CALL      L:halSpiStrobe
+    328                      if(status[1] && 0x80)                 //如果检验成功，则返回报文长度
+   \   00005C 0D 02        TNZ       (0x2,SP)
+   \   00005E 27 11        JREQ      L:??halRfReceivePacket_2
+    329                      {
+    330                          halSpiStrobe(0x36);halSpiStrobe(0x34);            //矫正CC1101时钟
+   \   000060 CD ....      CALL      L:?Subroutine26
+    331                          return(packetLength);
+   \                     ??CrossCallReturnLabel_60:
+   \   000063 B6 ..        LD        A, S:?b12
+   \   000065 20 0E        JRA       L:??halRfReceivePacket_3
+    332                      }
+    333                      else 
+    334                      {
+    335                          halSpiStrobe(0x36);halSpiStrobe(0x34);             //矫正CC1101时钟
+    336                     //     GPIO_ToggleBits(LED2_BLUE_PORT ,LED2_BLUE_PIN ); 
+    337                          return 0;
+    338                      }               
+    339                  }
+    340                  else 
+    341                  {         
+    342                      *length = packetLength;
+   \                     ??halRfReceivePacket_1:
+   \   000067 B6 ..        LD        A, S:?b12
+   \   000069 92C7 ..      LD        [S:?w4.w], A
+    343                      halSpiStrobe(0x3A);
+    344                      halSpiStrobe(0x36);halSpiStrobe(0x34);            //矫正CC1101时钟 
+    345                 //     GPIO_ToggleBits(LED2_BLUE_PORT ,LED2_BLUE_PIN ); 
+    346                      return 0;
+    347                  }
+    348              }
+    349              else
+    350              {   
+    351                  halSpiStrobe(0x3A);halSpiStrobe(0x36);halSpiStrobe(0x34);
+   \                     ??halRfReceivePacket_0:
+   \   00006C A6 3A        LD        A, #0x3a
+   \   00006E CD ....      CALL      L:halSpiStrobe
+    352                //  GPIO_ToggleBits(LED2_BLUE_PORT ,LED2_BLUE_PIN );
+    353              } //清洗接收缓冲区
+   \                     ??halRfReceivePacket_2:
+   \   000071 CD ....      CALL      L:?Subroutine26
+    354              return 0;        
+   \                     ??CrossCallReturnLabel_59:
+   \   000074 4F           CLR       A
+   \                     ??halRfReceivePacket_3:
+   \   000075 5B 02        ADD       SP, #0x2
+   \   000077 32 ....      POP       S:?b12
+   \   00007A CC ....      JP        L:?epilogue_l2
+    355          }
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine26:
+   \   000000 A6 36        LD        A, #0x36
+   \   000002 CD ....      CALL      L:halSpiStrobe
+   \   000005 A6 34        LD        A, #0x34
+   \   000007 CC ....      JP        L:halSpiStrobe
+    356          /************  CC1100发送一组数据 ******************/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine8:
+   \   000000 CD ....      CALL      L:?Subroutine59
+   \                     ??CrossCallReturnLabel_127:
+   \   000003 CC ....      JP        L:timer2_delay
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    357          void halRfSendPacket(INT8U *txBuffer, INT8U size) 
+    358          {
+   \                     halRfSendPacket:
+   \   000000 CD ....      CALL      L:?push_w4
+   \   000003 3B ....      PUSH      S:?b10
+   \   000006 BF ..        LDW       S:?w4, X
+   \   000008 B7 ..        LD        S:?b10, A
+    359              halSpiWriteReg(0x3F, size);   
+   \   00000A 45 .. ..     MOV       S:?b0, S:?b10
+   \   00000D A6 3F        LD        A, #0x3f
+   \   00000F CD ....      CALL      L:halSpiWriteReg
+    360              halSpiWriteBurstReg(0x3F, txBuffer, size);	//写入发送数据    
+   \   000012 45 .. ..     MOV       S:?b0, S:?b10
+   \   000015 BE ..        LDW       X, S:?w4
+   \   000017 A6 3F        LD        A, #0x3f
+   \   000019 CD ....      CALL      L:halSpiWriteBurstReg
+    361              halSpiStrobe(0x35);                         //进入发送模式
+   \   00001C A6 35        LD        A, #0x35
+   \   00001E CD ....      CALL      L:halSpiStrobe
+    362              timer2_delay(3);  //3ms
+   \   000021 AE 0003      LDW       X, #0x3
+   \   000024 CD ....      CALL      L:?Subroutine8
+    363              halSpiStrobe(0x3B);                        //清空发送区数据
+   \                     ??CrossCallReturnLabel_23:
+   \   000027 A6 3B        LD        A, #0x3b
+   \   000029 CD ....      CALL      L:halSpiStrobe
+    364          }
+   \   00002C 32 ....      POP       S:?b10
+   \   00002F CC ....      JP        L:?epilogue_w4
+    365          
+    366          
+    367          /**
+    368          @function：按键Key1处理函数 -- 选择 & 学习 
+    369          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine3:
+   \   000000 CD ....      CALL      L:?Subroutine47
+   \                     ??CrossCallReturnLabel_108:
+   \   000003 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine47:
+   \   000000 A6 01        LD        A, #0x1
+   \   000002 AE 5005      LDW       X, #0x5005
+   \   000005 CC ....      JP        L:GPIO_SetBits
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine27:
+   \   000000 C6 ....      LD        A, L:learn_mode
+   \   000003 A1 11        CP        A, #0x11
+   \   000005 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine20:
+   \   000000 5F           CLRW      X
+   \   000001 CF ....      LDW       L:WaitForConfirm_time, X
+   \   000004 CF ....      LDW       L:WaitForConfirm_time + 2, X
+   \   000007 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    370          void  Key1_Function(void)
+    371          {      
+    372              if(learn_mode == ON)
+   \                     Key1_Function:
+   \   000000 CD ....      CALL      L:?Subroutine27
+   \                     ??CrossCallReturnLabel_65:
+   \   000003 26 18        JRNE      L:??Key1_Function_0
+    373              {
+    374                  if(key1_time_count > 5)
+   \   000005 CD ....      CALL      L:?Subroutine41
+   \                     ??CrossCallReturnLabel_177:
+   \   000008 26 05        JRNE      L:??Key1_Function_1
+   \   00000A BE ..        LDW       X, S:?w1
+   \   00000C A3 0006      CPW       X, #0x6
+   \                     ??Key1_Function_1:
+   \   00000F 25 0C        JRC       L:??Key1_Function_0
+    375                  {
+    376                    Key1_InterruptPushflag  = 0;
+   \   000011 725F ....    CLR       L:Key1_InterruptPushflag
+    377                    Key1_Short_Pushed = 1; 
+   \   000015 35 01 ....   MOV       L:Key1_Short_Pushed, #0x1
+    378                    check_key1 = 0;
+   \   000019 725F ....    CLR       L:check_key1
+    379                  }
+    380              }
+    381              if(KEY1_INPUT)
+   \                     ??Key1_Function_0:
+   \   00001D A6 40        LD        A, #0x40
+   \   00001F AE 500A      LDW       X, #0x500a
+   \   000022 CD ....      CALL      L:GPIO_ReadInputDataBit
+   \   000025 A1 00        CP        A, #0x0
+   \   000027 27 03        JREQ      L:??CrossCallReturnLabel_99
+    382              {
+    383                  Key1_InterruptPushflag  = 0;
+   \   000029 CD ....      CALL      L:?Subroutine43
+    384                  check_key1 = 0;
+    385              }
+    386              
+    387              /** 按键1-长按进入学习模式 **/
+    388              if((key1_time_count > 400)  && (learn_mode == OFF) )
+   \                     ??CrossCallReturnLabel_99:
+   \   00002C CD ....      CALL      L:?Subroutine41
+   \                     ??CrossCallReturnLabel_178:
+   \   00002F 26 05        JRNE      L:??Key1_Function_2
+   \   000031 BE ..        LDW       X, S:?w1
+   \   000033 A3 0191      CPW       X, #0x191
+   \                     ??Key1_Function_2:
+   \   000036 25 1F        JRC       L:??CrossCallReturnLabel_50
+   \   000038 C6 ....      LD        A, L:learn_mode
+   \   00003B A1 10        CP        A, #0x10
+   \   00003D 26 18        JRNE      L:??CrossCallReturnLabel_50
+    389              {        
+    390                  //定时器在按键1中断中开启，至此未关闭 
+    391                  Key1_InterruptPushflag = 0;
+   \   00003F CD ....      CALL      L:?Subroutine43
+    392                  check_key1 = 0;
+    393                  Led1_Off(); LED1_GREEN; 
+   \                     ??CrossCallReturnLabel_100:
+   \   000042 CD ....      CALL      L:Led1_Off
+   \   000045 CD ....      CALL      L:?Subroutine3
+    394                  led_blink_time    = 0;
+   \                     ??CrossCallReturnLabel_10:
+   \   000048 725F ....    CLR       L:led_blink_time
+    395                  Key1_Short_Pushed = 0;
+   \   00004C 725F ....    CLR       L:Key1_Short_Pushed
+    396          
+    397                  learn_mode          = ON;           //置学习模式标志为1                                  
+   \   000050 35 11 ....   MOV       L:learn_mode, #0x11
+    398                  WaitForConfirm_time = 0; 
+   \   000054 CD ....      CALL      L:?Subroutine20
+    399              }                 
+    400          }
+   \                     ??CrossCallReturnLabel_50:
+   \   000057 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine43:
+   \   000000 725F ....    CLR       L:Key1_InterruptPushflag
+   \   000004 725F ....    CLR       L:check_key1
+   \   000008 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine41:
+   \   000000 AE ....      LDW       X, #key1_time_count
+   \   000003              REQUIRE ??Subroutine73_0
+   \   000003              ;               // Fall through to label ??Subroutine73_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine73_0:
+   \   000000 CD ....      CALL      L:?load32_l0_0x
+   \   000003 BE ..        LDW       X, S:?w0
+   \   000005 A3 0000      CPW       X, #0x0
+   \   000008 81           RET
+    401          
+    402               
+    403          
+    404          /**
+    405          @function：无操作 定时 退出 学习模式 
+    406          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    407          void Auto_Exit_LearnMode_Function(void)
+    408          {
+    409              if(learn_mode == ON)                   
+   \                     Auto_Exit_LearnMode_Function:
+   \   000000 CD ....      CALL      L:?Subroutine27
+   \                     ??CrossCallReturnLabel_64:
+   \   000003 26 46        JRNE      L:??Auto_Exit_LearnMode_Function_0
+    410              {                         
+    411                  if(auto_exit_time > 3200)                  //15s   自动退出学习模式
+   \   000005 AE ....      LDW       X, #auto_exit_time
+   \   000008 CD ....      CALL      L:??Subroutine73_0
+   \                     ??CrossCallReturnLabel_175:
+   \   00000B 26 05        JRNE      L:??Auto_Exit_LearnMode_Function_1
+   \   00000D BE ..        LDW       X, S:?w1
+   \   00000F A3 0C81      CPW       X, #0xc81
+   \                     ??Auto_Exit_LearnMode_Function_1:
+   \   000012 25 1A        JRC       L:??Auto_Exit_LearnMode_Function_2
+    412                  {    
+    413                      TIM4_Cmd(DISABLE);                     //关闭定时器
+   \   000014 4F           CLR       A
+   \   000015 CD ....      CALL      L:TIM4_Cmd
+    414                      led_blink_time  = 0;
+   \   000018 725F ....    CLR       L:led_blink_time
+    415                      auto_exit_time  = 0;   
+   \   00001C 5F           CLRW      X
+   \   00001D CF ....      LDW       L:auto_exit_time, X
+   \   000020 CF ....      LDW       L:auto_exit_time + 2, X
+    416                      Choose_Line     = 1;                //回路选择重新置1
+   \   000023 35 01 ....   MOV       L:Choose_Line, #0x1
+    417                      learn_mode      = OFF;              //退出学习模式，进入工作模式           
+   \   000027 35 10 ....   MOV       L:learn_mode, #0x10
+    418                      Led1_Off();                         //关闭两个LED灯   
+   \   00002B CD ....      CALL      L:Led1_Off
+    419                  }
+    420                  if(LearnModeWaitForConfirm == ON)
+   \                     ??Auto_Exit_LearnMode_Function_2:
+   \   00002E C6 ....      LD        A, L:LearnModeWaitForConfirm
+   \   000031 A1 11        CP        A, #0x11
+   \   000033 26 16        JRNE      L:??Auto_Exit_LearnMode_Function_0
+    421                  {
+    422                      if(WaitForConfirm_time > 1200)      //自动退学学习确认等待
+   \   000035 AE ....      LDW       X, #WaitForConfirm_time
+   \   000038 CD ....      CALL      L:??Subroutine73_0
+   \                     ??CrossCallReturnLabel_176:
+   \   00003B 26 05        JRNE      L:??Auto_Exit_LearnMode_Function_3
+   \   00003D BE ..        LDW       X, S:?w1
+   \   00003F A3 04B1      CPW       X, #0x4b1
+   \                     ??Auto_Exit_LearnMode_Function_3:
+   \   000042 25 07        JRC       L:??Auto_Exit_LearnMode_Function_0
+    423                      {
+    424                           WaitForConfirm_time     = 0;
+   \   000044 CD ....      CALL      L:?Subroutine20
+    425                           LearnModeWaitForConfirm = OFF;                 
+   \                     ??CrossCallReturnLabel_49:
+   \   000047 35 10 ....   MOV       L:LearnModeWaitForConfirm, #0x10
+    426                      }        
+    427                  }
+    428              } 
+    429          }
+   \                     ??Auto_Exit_LearnMode_Function_0:
+   \   00004B 81           RET
+    430          
+    431          
+    432          /**
+    433          @function：第一次开机 Flash相关初始化
+    434          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine17:
+   \   000000 A6 F7        LD        A, #0xf7
+   \   000002 CD ....      CALL      L:FLASH_Unlock
+   \   000005              REQUIRE ??Subroutine64_0
+   \   000005              ;               // Fall through to label ??Subroutine64_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine64_0:
+   \   000000 5F           CLRW      X
+   \   000001 BF ..        LDW       S:?w0, X
+   \   000003              REQUIRE ??Subroutine65_0
+   \   000003              ;               // Fall through to label ??Subroutine65_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine67_0:
+   \   000000 5F           CLRW      X
+   \   000001 BF ..        LDW       S:?w0, X
+   \   000003 CC ....      JP        L:FLASH_ReadByte
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine70_0:
+   \   000000 CD ....      CALL      L:?Subroutine53
+   \                     ??CrossCallReturnLabel_165:
+   \   000003 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine53:
+   \   000000 BF ..        LDW       S:?w1, X
+   \   000002              REQUIRE ??Subroutine71_0
+   \   000002              ;               // Fall through to label ??Subroutine71_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine71_0:
+   \   000000 5F           CLRW      X
+   \   000001 BF ..        LDW       S:?w0, X
+   \   000003 CC ....      JP        L:FLASH_ProgramByte
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    435          void FirstPower(void)
+    436          {
+    437              INT8U firstpowernum;
+    438              FLASH_SetProgrammingTime(FLASH_ProgramTime_Standard);      //选定Flash模式
+   \                     FirstPower:
+   \   000000 4F           CLR       A
+   \   000001 CD ....      CALL      L:FLASH_SetProgrammingTime
+    439              FLASH_Unlock(FLASH_MemType_Data);                          //解锁Flash
+   \   000004 CD ....      CALL      L:?Subroutine17
+    440              timer2_delay(1);    
+    441              firstpowernum = FLASH_ReadByte(IFFIRSTPOWERNUMADRESS);
+    442              if(firstpowernum == 0x25)  //不是第一次开机
+   \                     ??CrossCallReturnLabel_143:
+   \   000007 AE 1002      LDW       X, #0x1002
+   \   00000A CD ....      CALL      L:?Subroutine15
+   \                     ??CrossCallReturnLabel_41:
+   \   00000D A1 25        CP        A, #0x25
+   \   00000F 26 06        JRNE      L:??FirstPower_0
+    443              {
+    444                  firstpower = 0;                                             
+   \   000011 725F ....    CLR       L:firstpower
+   \   000015 20 0C        JRA       L:??CrossCallReturnLabel_162
+    445              }
+    446              else       
+    447              {   
+    448                  //TODO 清空Flash数据
+    449                  //ClearFlash();
+    450                  firstpower = 1;       //第一次上电开机
+   \                     ??FirstPower_0:
+   \   000017 35 01 ....   MOV       L:firstpower, #0x1
+    451                  FLASH_ProgramByte(IFFIRSTPOWERNUMADRESS,0x25); 
+   \   00001B A6 25        LD        A, #0x25
+   \   00001D AE 1002      LDW       X, #0x1002
+   \   000020 CD ....      CALL      L:??Subroutine70_0
+    452              }
+    453              FLASH_Lock(FLASH_MemType_Data);                            //锁定Flash  
+   \                     ??CrossCallReturnLabel_162:
+   \   000023 A6 F7        LD        A, #0xf7
+   \   000025 CC ....      JP        L:FLASH_Lock
+    454          }
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine15:
+   \   000000 CD ....      CALL      L:?Subroutine51
+   \                     ??CrossCallReturnLabel_170:
+   \   000003 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine51:
+   \   000000 BF ..        LDW       S:?w1, X
+   \   000002              REQUIRE ??Subroutine72_0
+   \   000002              ;               // Fall through to label ??Subroutine72_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine72_0:
+   \   000000 CD ....      CALL      L:??Subroutine67_0
+   \                     ??CrossCallReturnLabel_172:
+   \   000003 81           RET
+    455          
+    456          /**
+    457          @function：初始化读取Flash中ID
+    458          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine34:
+   \   000000 A6 F7        LD        A, #0xf7
+   \   000002 CC ....      JP        L:FLASH_Lock
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    459          void ReadIdInFlash(void)
+    460          {
+   \                     ReadIdInFlash:
+   \   000000 CD ....      CALL      L:?push_l3
+   \   000003 CD ....      CALL      L:?push_w4
+   \   000006 3B ....      PUSH      S:?b10
+    461              INT8U i;
+    462              INT16U flash_start = IDSTARTADDRESS;                         //Flash初始位置  
+   \   000009 AE 1010      LDW       X, #0x1010
+   \   00000C BF ..        LDW       S:?w6, X
+    463              FLASH_Unlock(FLASH_MemType_Data);                            //解锁Flash 
+   \   00000E CD ....      CALL      L:?Subroutine17
+    464              timer2_delay(1);                                             //等待解锁Flash完成      
+    465              if(firstpower == 1)                                          //第一次开机
+   \                     ??CrossCallReturnLabel_144:
+   \   000011 C6 ....      LD        A, L:firstpower
+   \   000014 A1 01        CP        A, #0x1
+   \   000016 26 10        JRNE      L:??ReadIdInFlash_0
+    466              {
+    467                FLASH_ProgramByte(NEWIDADDRESSINFLASH_PART_1,0x10);        //将0x1010写入该位置
+   \   000018 A6 10        LD        A, #0x10
+   \   00001A AE 1005      LDW       X, #0x1005
+   \   00001D CD ....      CALL      L:?Subroutine11
+    468                FLASH_ProgramByte(NEWIDADDRESSINFLASH_PART_2,0x10);     
+    469              } 
+   \                     ??CrossCallReturnLabel_35:
+   \   000020 AE 1006      LDW       X, #0x1006
+   \   000023 CD ....      CALL      L:??Subroutine70_0
+   \                     ??CrossCallReturnLabel_161:
+   \   000026 20 20        JRA       L:??ReadIdInFlash_1
+    470              else if(firstpower == 0)                                     //非第一次开机
+   \                     ??ReadIdInFlash_0:
+   \   000028 C6 ....      LD        A, L:firstpower
+   \   00002B 26 1B        JRNE      L:??ReadIdInFlash_1
+    471              {
+    472                Public_learned_ID_num = FLASH_ReadByte(IDCOUNTADD);
+   \   00002D CD ....      CALL      L:?Subroutine7
+    473                IdStartAddress = (FLASH_ReadByte(NEWIDADDRESSINFLASH_PART_1)<<8)+(FLASH_ReadByte(NEWIDADDRESSINFLASH_PART_2));
+   \                     ??CrossCallReturnLabel_22:
+   \   000030 5F           CLRW      X
+   \   000031 97           LD        XL, A
+   \   000032 BF ..        LDW       S:?w0, X
+   \   000034 B6 ..        LD        A, S:?b8
+   \   000036 41           EXG       A, XL
+   \   000037 4F           CLR       A
+   \   000038 02           RLWA      X, A
+   \   000039 72BB ....    ADDW      X, S:?w0
+   \   00003D CF ....      LDW       L:IdStartAddress, X
+    474                if(IdStartAddress == 0x0)
+   \   000040 26 06        JRNE      L:??ReadIdInFlash_1
+    475                {
+    476                    IdStartAddress = IDSTARTADDRESS;
+   \   000042 AE 1010      LDW       X, #0x1010
+   \   000045 CF ....      LDW       L:IdStartAddress, X
+    477                }
+    478              } 
+    479              for(i = 0;i < MAXLEARNNUM;i++)  //注意数组溢出                            
+   \                     ??ReadIdInFlash_1:
+   \   000048 3F ..        CLR       S:?b10
+    480              {
+    481                AllRadio[i].Id_part_1 = FLASH_ReadByte(flash_start);        //将Flash中ID读取到本地内存中
+   \                     ??ReadIdInFlash_2:
+   \   00004A CD ....      CALL      L:?Subroutine19
+    482                flash_start++;
+    483                AllRadio[i].Id_part_2 = FLASH_ReadByte(flash_start);
+    484                flash_start++;
+    485                AllRadio[i].Id_part_3 = FLASH_ReadByte(flash_start);
+    486                flash_start++;
+    487                AllRadio[i].Id_part_4 = FLASH_ReadByte(flash_start);
+    488                flash_start++;
+    489                
+    490                ABIO_Function[i].AI_Line1 = FLASH_ReadByte(flash_start);    //将Flash中开关对应的动作读取到本地内存中
+    491                flash_start++;
+    492                ABIO_Function[i].AO_Line1 = FLASH_ReadByte(flash_start);
+    493                flash_start++;
+    494                ABIO_Function[i].BI_Line1 = FLASH_ReadByte(flash_start);
+    495                flash_start++;     
+    496                ABIO_Function[i].BO_Line1 = FLASH_ReadByte(flash_start);
+    497                flash_start++; 
+    498                ABIO_Function[i].TOOGLE_Line1 = FLASH_ReadByte(flash_start);
+    499                flash_start++;       
+    500                                
+    501                flash_start+=0x7;
+    502              }   
+   \                     ??CrossCallReturnLabel_47:
+   \   00004D CD ....      CALL      L:?Subroutine50
+   \                     ??CrossCallReturnLabel_111:
+   \   000050 CD ....      CALL      L:?Subroutine18
+   \                     ??CrossCallReturnLabel_45:
+   \   000053 BF ..        LDW       S:?w6, X
+   \   000055 B6 ..        LD        A, S:?b10
+   \   000057 4C           INC       A
+   \   000058 B7 ..        LD        S:?b10, A
+   \   00005A A1 0A        CP        A, #0xa
+   \   00005C 25 EC        JRC       L:??ReadIdInFlash_2
+    503              FLASH_Lock(FLASH_MemType_Data);   //锁定Flash
+   \   00005E CD ....      CALL      L:?Subroutine34
+    504          }
+   \                     ??CrossCallReturnLabel_77:
+   \   000061 32 ....      POP       S:?b10
+   \   000064 CD ....      CALL      L:?pop_w4
+   \   000067 CD ....      CALL      L:?pop_l3
+   \   00006A 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine19:
+   \   000000 5F           CLRW      X
+   \   000001 41           EXG       A, XL
+   \   000002 B6 ..        LD        A, S:?b10
+   \   000004 41           EXG       A, XL
+   \   000005 BF ..        LDW       S:?w7, X
+   \   000007 AE 0007      LDW       X, #0x7
+   \   00000A CD ....      CALL      L:?Subroutine54
+   \                     ??CrossCallReturnLabel_116:
+   \   00000D 1C ....      ADDW      X, #AllRadio
+   \   000010 BF ..        LDW       S:?w4, X
+   \   000012 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine18:
+   \   000000 CD ....      CALL      L:?Subroutine45
+   \                     ??CrossCallReturnLabel_103:
+   \   000003 5C           INCW      X
+   \   000004 BF ..        LDW       S:?w6, X
+   \   000006 AE 0005      LDW       X, #0x5
+   \   000009 CD ....      CALL      L:?Subroutine54
+   \                     ??CrossCallReturnLabel_115:
+   \   00000C 1C ....      ADDW      X, #ABIO_Function
+   \   00000F BF ..        LDW       S:?w4, X
+   \   000011 CD ....      CALL      L:?mov_w1_w6
+   \   000014 CD ....      CALL      L:??Subroutine72_0
+   \                     ??CrossCallReturnLabel_171:
+   \   000017 92C7 ..      LD        [S:?w4.w], A
+   \   00001A BE ..        LDW       X, S:?w6
+   \   00001C 5C           INCW      X
+   \   00001D BF ..        LDW       S:?w6, X
+   \   00001F CD ....      CALL      L:?Subroutine50
+   \                     ??CrossCallReturnLabel_112:
+   \   000022 CD ....      CALL      L:?Subroutine45
+   \                     ??CrossCallReturnLabel_104:
+   \   000025 1C 0008      ADDW      X, #0x8
+   \   000028 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine54:
+   \   000000 BF ..        LDW       S:?w0, X
+   \   000002 BE ..        LDW       X, S:?w7
+   \   000004 CC ....      JP        L:?mul16_x_x_w0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine50:
+   \   000000 CD ....      CALL      L:?Subroutine60
+   \                     ??CrossCallReturnLabel_174:
+   \   000003 BE ..        LDW       X, S:?w4
+   \   000005 5C           INCW      X
+   \   000006 F7           LD        (X), A
+   \   000007 BE ..        LDW       X, S:?w6
+   \   000009 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine60:
+   \   000000 CD ....      CALL      L:?mov_w1_w6
+   \   000003              REQUIRE ??Subroutine67_0
+   \   000003              ;               // Fall through to label ??Subroutine67_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine45:
+   \   000000 CD ....      CALL      L:??Subroutine68_0
+   \                     ??CrossCallReturnLabel_155:
+   \   000003 1C 0002      ADDW      X, #0x2
+   \   000006 CD ....      CALL      L:?Subroutine58
+   \                     ??CrossCallReturnLabel_153:
+   \   000009 1C 0003      ADDW      X, #0x3
+   \   00000C CD ....      CALL      L:?Subroutine58
+   \                     ??CrossCallReturnLabel_154:
+   \   00000F 1C 0004      ADDW      X, #0x4
+   \   000012 F7           LD        (X), A
+   \   000013 BE ..        LDW       X, S:?w6
+   \   000015 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine58:
+   \   000000 F7           LD        (X), A
+   \   000001 BE ..        LDW       X, S:?w6
+   \   000003              REQUIRE ??Subroutine68_0
+   \   000003              ;               // Fall through to label ??Subroutine68_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine68_0:
+   \   000000 5C           INCW      X
+   \   000001 BF ..        LDW       S:?w6, X
+   \   000003 CD ....      CALL      L:?Subroutine60
+   \                     ??CrossCallReturnLabel_173:
+   \   000006 BE ..        LDW       X, S:?w4
+   \   000008 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine11:
+   \   000000 CD ....      CALL      L:?Subroutine53
+   \                     ??CrossCallReturnLabel_164:
+   \   000003 A6 10        LD        A, #0x10
+   \   000005 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine7:
+   \   000000 AE 1003      LDW       X, #0x1003
+   \   000003 CD ....      CALL      L:?Subroutine51
+   \                     ??CrossCallReturnLabel_167:
+   \   000006 C7 ....      LD        L:Public_learned_ID_num, A
+   \   000009 AE 1005      LDW       X, #0x1005
+   \   00000C CD ....      CALL      L:?Subroutine51
+   \                     ??CrossCallReturnLabel_168:
+   \   00000F B7 ..        LD        S:?b8, A
+   \   000011 AE 1006      LDW       X, #0x1006
+   \   000014 CD ....      CALL      L:?Subroutine51
+   \                     ??CrossCallReturnLabel_169:
+   \   000017 81           RET
+    505          
+    506          /** 
+    507          @function： 在本地参数中查找ID 
+    508          @parameter: 报文ID
+    509          @return:    该ID在Flash中的位置（从0开始计数），若无，则返回FINDINFLASH_FAIL 
+    510          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine61_0:
+   \   000000 9093         LDW       Y, X
+   \   000002 72A9 0003    ADDW      Y, #0x3
+   \   000006 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine62_0:
+   \   000000 9093         LDW       Y, X
+   \   000002 72A9 0002    ADDW      Y, #0x2
+   \   000006 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine21:
+   \   000000 61           EXG       A, YL
+   \   000001              REQUIRE ??Subroutine63_0
+   \   000001              ;               // Fall through to label ??Subroutine63_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine63_0:
+   \   000000 CD ....      CALL      L:?Subroutine49
+   \                     ??CrossCallReturnLabel_140:
+   \   000003 9093         LDW       Y, X
+   \   000005 905C         INCW      Y
+   \   000007 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine49:
+   \   000000 AE 0007      LDW       X, #0x7
+   \   000003 BF ..        LDW       S:?w0, X
+   \   000005 93           LDW       X, Y
+   \   000006 CD ....      CALL      L:?mul16_x_x_w0
+   \   000009 1C ....      ADDW      X, #AllRadio
+   \   00000C 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    511          INT8U FindIdInFlash(INT8U ID_Part1,INT8U ID_Part2,INT8U ID_Part3,INT8U ID_Part4)
+    512          {
+   \                     FindIdInFlash:
+   \   000000 B7 ..        LD        S:?b6, A
+   \   000002 45 .. ..     MOV       S:?b3, S:?b0
+   \   000005 45 .. ..     MOV       S:?b4, S:?b1
+    513              INT8U i;  
+    514              for(i = 0 ; i < MAXLEARNNUM ; i++)       //TODO 可优化，根据学习数量来进行查找    
+   \   000008 3F ..        CLR       S:?b5
+    515              {           
+    516                  if(AllRadio[i].Id_part_1==ID_Part1&&(AllRadio[i].Id_part_2==ID_Part2)&&(AllRadio[i].Id_part_3==ID_Part3)&&(AllRadio[i].Id_part_4==ID_Part4))
+   \                     ??FindIdInFlash_0:
+   \   00000A 905F         CLRW      Y
+   \   00000C 61           EXG       A, YL
+   \   00000D B6 ..        LD        A, S:?b5
+   \   00000F CD ....      CALL      L:?Subroutine21
+   \                     ??CrossCallReturnLabel_138:
+   \   000012 B6 ..        LD        A, S:?b6
+   \   000014 90F1         CP        A, (Y)
+   \   000016 26 1D        JRNE      L:??FindIdInFlash_1
+   \   000018 CD ....      CALL      L:??Subroutine62_0
+   \                     ??CrossCallReturnLabel_135:
+   \   00001B B6 ..        LD        A, S:?b3
+   \   00001D 90F1         CP        A, (Y)
+   \   00001F 26 14        JRNE      L:??FindIdInFlash_1
+   \   000021 CD ....      CALL      L:??Subroutine61_0
+   \                     ??CrossCallReturnLabel_132:
+   \   000024 B6 ..        LD        A, S:?b4
+   \   000026 90F1         CP        A, (Y)
+   \   000028 26 0B        JRNE      L:??FindIdInFlash_1
+   \   00002A 1C 0004      ADDW      X, #0x4
+   \   00002D B6 ..        LD        A, S:?b2
+   \   00002F F1           CP        A, (X)
+   \   000030 26 03        JRNE      L:??FindIdInFlash_1
+    517                  {          
+    518                       return(i);
+   \   000032 B6 ..        LD        A, S:?b5
+   \   000034 81           RET
+    519                  }        
+    520              }
+   \                     ??FindIdInFlash_1:
+   \   000035 B6 ..        LD        A, S:?b5
+   \   000037 4C           INC       A
+   \   000038 B7 ..        LD        S:?b5, A
+   \   00003A A1 0A        CP        A, #0xa
+   \   00003C 25 CC        JRC       L:??FindIdInFlash_0
+    521              return(FINDINFLASH_FAIL);
+   \   00003E A6 77        LD        A, #0x77
+   \   000040 81           RET
+    522          }
+    523          
+    524          /**
+    525          @function： 将ID写入Flash中 
+    526          @parameter：需写入Flash的ID    按照空闲位置顺序写入Flash
+    527          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine33:
+   \   000000 90F7         LD        (Y), A
+   \   000002              REQUIRE ??Subroutine61_0
+   \   000002              ;               // Fall through to label ??Subroutine61_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine31:
+   \   000000 90F7         LD        (Y), A
+   \   000002              REQUIRE ??Subroutine62_0
+   \   000002              ;               // Fall through to label ??Subroutine62_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    528          void WriteIdInFlash(INT8U ID_Part1,INT8U ID_Part2,INT8U ID_Part3,INT8U ID_Part4)
+    529          {
+   \                     WriteIdInFlash:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 B7 ..        LD        S:?b11, A
+   \   000005 45 .. ..     MOV       S:?b10, S:?b0
+   \   000008 45 .. ..     MOV       S:?b8, S:?b1
+   \   00000B 45 .. ..     MOV       S:?b9, S:?b2
+    530              FLASH_Unlock(FLASH_MemType_Data);                                   //解锁Flash
+   \   00000E CD ....      CALL      L:?Subroutine16
+    531              timer2_delay(1);  
+    532              
+    533              AllRadio[Public_learned_ID_num].Id_part_1=ID_Part1;                    //将ID保存到本地的变量中
+   \                     ??CrossCallReturnLabel_43:
+   \   000011 905F         CLRW      Y
+   \   000013 9097         LD        YL, A
+   \   000015 CD ....      CALL      L:??Subroutine63_0
+   \                     ??CrossCallReturnLabel_136:
+   \   000018 B6 ..        LD        A, S:?b11
+   \   00001A CD ....      CALL      L:?Subroutine31
+    534              AllRadio[Public_learned_ID_num].Id_part_2=ID_Part2;
+   \                     ??CrossCallReturnLabel_134:
+   \   00001D B6 ..        LD        A, S:?b10
+   \   00001F CD ....      CALL      L:?Subroutine33
+    535              AllRadio[Public_learned_ID_num].Id_part_3=ID_Part3;
+   \                     ??CrossCallReturnLabel_131:
+   \   000022 B6 ..        LD        A, S:?b8
+   \   000024 90F7         LD        (Y), A
+    536              AllRadio[Public_learned_ID_num].Id_part_4=ID_Part4;    
+   \   000026 1C 0004      ADDW      X, #0x4
+   \   000029 B6 ..        LD        A, S:?b9
+   \   00002B F7           LD        (X), A
+    537              Public_learned_ID_num++;                                               //已学习ID数量加1
+   \   00002C C6 ....      LD        A, L:Public_learned_ID_num
+   \   00002F 4C           INC       A
+   \   000030 CD ....      CALL      L:?Subroutine14
+    538              FLASH_ProgramByte(IDCOUNTADD,Public_learned_ID_num);                                   
+    539                  
+    540              FLASH_ProgramByte(IdStartAddress,ID_Part1);                            //将ID分开写入Flash中
+   \                     ??CrossCallReturnLabel_157:
+   \   000033 B6 ..        LD        A, S:?b11
+   \   000035 CE ....      LDW       X, L:IdStartAddress
+   \   000038 CD ....      CALL      L:?Subroutine9
+    541              IdStartAddress++;
+    542              FLASH_ProgramByte(IdStartAddress,ID_Part2);
+   \                     ??CrossCallReturnLabel_29:
+   \   00003B B6 ..        LD        A, S:?b10
+   \   00003D CD ....      CALL      L:?Subroutine9
+    543              IdStartAddress++;
+    544              FLASH_ProgramByte(IdStartAddress,ID_Part3);
+   \                     ??CrossCallReturnLabel_30:
+   \   000040 B6 ..        LD        A, S:?b8
+   \   000042 CD ....      CALL      L:?Subroutine9
+    545              IdStartAddress++;
+    546              FLASH_ProgramByte(IdStartAddress,ID_Part4);   
+   \                     ??CrossCallReturnLabel_31:
+   \   000045 B6 ..        LD        A, S:?b9
+   \   000047 CD ....      CALL      L:?Subroutine10
+    547              IdStartAddress += 0xD;
+   \                     ??CrossCallReturnLabel_32:
+   \   00004A 1C 000D      ADDW      X, #0xd
+   \   00004D CF ....      LDW       L:IdStartAddress, X
+    548              
+    549              FLASH_ProgramByte(NEWIDADDRESSINFLASH_PART_1,(IdStartAddress >> 8));   //将IdStartAddress写入该位置
+   \   000050 4F           CLR       A
+   \   000051 01           RRWA      X, A
+   \   000052 9F           LD        A, XL
+   \   000053 AE 1005      LDW       X, #0x1005
+   \   000056 CD ....      CALL      L:?Subroutine10
+    550              FLASH_ProgramByte(NEWIDADDRESSINFLASH_PART_2,(IdStartAddress & 0xff));
+   \                     ??CrossCallReturnLabel_33:
+   \   000059 9F           LD        A, XL
+   \   00005A AE 1006      LDW       X, #0x1006
+   \   00005D CD ....      CALL      L:??Subroutine70_0
+    551              
+    552              FLASH_Lock(FLASH_MemType_Data);                                     //锁定Flash
+   \                     ??CrossCallReturnLabel_160:
+   \   000060 CD ....      CALL      L:?Subroutine34
+    553          }
+   \                     ??CrossCallReturnLabel_78:
+   \   000063 CC ....      JP        L:?epilogue_l2
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine16:
+   \   000000 A6 F7        LD        A, #0xf7
+   \   000002 CD ....      CALL      L:FLASH_Unlock
+   \   000005 5F           CLRW      X
+   \   000006 BF ..        LDW       S:?w0, X
+   \   000008 5C           INCW      X
+   \   000009 BF ..        LDW       S:?w1, X
+   \   00000B CD ....      CALL      L:timer2_delay
+   \   00000E C6 ....      LD        A, L:Public_learned_ID_num
+   \   000011 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine10:
+   \   000000 CD ....      CALL      L:?Subroutine52
+   \                     ??CrossCallReturnLabel_113:
+   \   000003 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine52:
+   \   000000 CD ....      CALL      L:?Subroutine59
+   \                     ??CrossCallReturnLabel_129:
+   \   000003 CD ....      CALL      L:FLASH_ProgramByte
+   \   000006 CE ....      LDW       X, L:IdStartAddress
+   \   000009 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine9:
+   \   000000 CD ....      CALL      L:?Subroutine52
+   \                     ??CrossCallReturnLabel_114:
+   \   000003 5C           INCW      X
+   \   000004 CF ....      LDW       L:IdStartAddress, X
+   \   000007 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine14:
+   \   000000 C7 ....      LD        L:Public_learned_ID_num, A
+   \   000003              REQUIRE ??Subroutine69_0
+   \   000003              ;               // Fall through to label ??Subroutine69_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine69_0:
+   \   000000 AE 1003      LDW       X, #0x1003
+   \   000003              REQUIRE ??Subroutine70_0
+   \   000003              ;               // Fall through to label ??Subroutine70_0
+    554          
+    555          
+    556          /**
+    557          @function： 将开关的键值对应的操作写入Flash中 
+    558          @parameter：key1 & key2： 开关中一路中两个按键的键值
+    559          @parameter：ABIO_Line：   对应执行器中的回路
+    560          @parameter：ID_NUM：      对应Flash中条目的编号（从0开始计数）
+    561          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine39:
+   \   000000 CD ....      CALL      L:?Subroutine57
+   \                     ??CrossCallReturnLabel_124:
+   \   000003 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine57:
+   \   000000 CD ....      CALL      L:?mov_l0_l2
+   \   000003 CC ....      JP        L:FLASH_ProgramByte
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    562          void WriteKeyOperationInFlash(INT8U ABIO_Line,INT8U ID_NUM)
+    563          {
+   \                     WriteKeyOperationInFlash:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 CD ....      CALL      L:?push_w6
+   \   000006 B7 ..        LD        S:?b8, A
+   \   000008 45 .. ..     MOV       S:?b9, S:?b0
+    564              FLASH_Unlock(FLASH_MemType_Data);   //解锁Flash
+   \   00000B CD ....      CALL      L:?Subroutine17
+    565              timer2_delay(1); 
+    566              uclong need_adress;
+    567              if(ABIO_Line == A_LINE1)               //AI_Line1 & AO_Line1 
+   \                     ??CrossCallReturnLabel_145:
+   \   00000E 5F           CLRW      X
+   \   00000F 41           EXG       A, XL
+   \   000010 B6 ..        LD        A, S:?b9
+   \   000012 41           EXG       A, XL
+   \   000013 9093         LDW       Y, X
+   \   000015 CD ....      CALL      L:?Subroutine22
+   \                     ??CrossCallReturnLabel_52:
+   \   000018 93           LDW       X, Y
+   \   000019 CD ....      CALL      L:?sll16_x_x_4
+   \   00001C B6 ..        LD        A, S:?b8
+   \   00001E A1 11        CP        A, #0x11
+   \   000020 26 1C        JRNE      L:??WriteKeyOperationInFlash_0
+    568              {
+    569                  need_adress = (IDSTARTADDRESS+0x10*ID_NUM+0x4);
+   \   000022 CD ....      CALL      L:?Subroutine40
+    570                  FLASH_ProgramByte(need_adress,AI);        //Line1 将AI:0x10 & AO:0x30写入flash
+   \                     ??CrossCallReturnLabel_152:
+   \   000025 A6 10        LD        A, #0x10
+   \   000027 CD ....      CALL      L:FLASH_ProgramByte
+    571                  ABIO_Function[ID_NUM].AI_Line1 = AI;      //写入用于本地使用的数组
+   \   00002A A6 10        LD        A, #0x10
+   \   00002C 92C7 ..      LD        [S:?w6.w], A
+    572                  need_adress ++;
+    573                  FLASH_ProgramByte(need_adress,AO);
+   \   00002F A6 30        LD        A, #0x30
+   \   000031 CD ....      CALL      L:?inc32_l2_l2
+   \   000034 CD ....      CALL      L:?Subroutine39
+    574                  ABIO_Function[ID_NUM].AO_Line1 = AO; 
+   \                     ??CrossCallReturnLabel_94:
+   \   000037 BE ..        LDW       X, S:?w6
+   \   000039 5C           INCW      X
+   \   00003A A6 30        LD        A, #0x30
+   \   00003C 20 2F        JRA       L:??WriteKeyOperationInFlash_1
+    575              }
+    576              if(ABIO_Line == B_LINE1)      //BI_Line1 & BO_Line1
+   \                     ??WriteKeyOperationInFlash_0:
+   \   00003E A1 12        CP        A, #0x12
+   \   000040 26 1A        JRNE      L:??WriteKeyOperationInFlash_2
+    577              {   
+    578                  need_adress = (IDSTARTADDRESS+0x10*ID_NUM+0x6);
+   \   000042 1C 1016      ADDW      X, #0x1016
+   \   000045 CD ....      CALL      L:??Subroutine66_0
+    579                  FLASH_ProgramByte(need_adress,BI);                   //Line1 将BI:0x50 & BO:0x70写入flash
+   \                     ??CrossCallReturnLabel_150:
+   \   000048 A6 50        LD        A, #0x50
+   \   00004A CD ....      CALL      L:?Subroutine36
+    580                  ABIO_Function[ID_NUM].BI_Line1 = BI;            
+   \                     ??CrossCallReturnLabel_86:
+   \   00004D A6 50        LD        A, #0x50
+   \   00004F F7           LD        (X), A
+    581                  need_adress++;
+    582                  FLASH_ProgramByte(need_adress,BO);  
+   \   000050 A6 70        LD        A, #0x70
+   \   000052 CD ....      CALL      L:?inc32_l2_l2
+   \   000055 CD ....      CALL      L:?Subroutine37
+    583                  ABIO_Function[ID_NUM].BO_Line1 = BO;          
+    584              } 
+   \                     ??CrossCallReturnLabel_88:
+   \   000058 A6 70        LD        A, #0x70
+   \   00005A 20 11        JRA       L:??WriteKeyOperationInFlash_1
+    585              if(ABIO_Line == ABIO_TOOGLE_LINE1)
+   \                     ??WriteKeyOperationInFlash_2:
+   \   00005C A1 18        CP        A, #0x18
+   \   00005E 26 0E        JRNE      L:??WriteKeyOperationInFlash_3
+    586              {
+    587                  need_adress = (IDSTARTADDRESS+0x10*ID_NUM+0x8);
+    588                  FLASH_ProgramByte(need_adress,ABIO_TOOGLE);         //Line1 反转操作写入flash
+   \   000060 A6 20        LD        A, #0x20
+   \   000062 1C 1018      ADDW      X, #0x1018
+   \   000065 CD ....      CALL      L:?sext32_l0_x
+   \   000068 CD ....      CALL      L:?Subroutine38
+    589                  ABIO_Function[ID_NUM].TOOGLE_Line1 = ABIO_TOOGLE;
+    590              }
+   \                     ??CrossCallReturnLabel_90:
+   \   00006B A6 20        LD        A, #0x20
+   \                     ??WriteKeyOperationInFlash_1:
+   \   00006D F7           LD        (X), A
+    591              
+    592               
+    593           
+    594              
+    595              FLASH_Lock(FLASH_MemType_Data);    //锁定Flash
+   \                     ??WriteKeyOperationInFlash_3:
+   \   00006E CD ....      CALL      L:?Subroutine34
+    596          }
+   \                     ??CrossCallReturnLabel_79:
+   \   000071 CC ....      JP        L:?epilogue_l2_w6
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine40:
+   \   000000 1C 1014      ADDW      X, #0x1014
+   \   000003              REQUIRE ??Subroutine66_0
+   \   000003              ;               // Fall through to label ??Subroutine66_0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ??Subroutine66_0:
+   \   000000 CD ....      CALL      L:?sext32_l0_x
+   \   000003 CC ....      JP        L:?mov_l2_l0
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine38:
+   \   000000 CD ....      CALL      L:FLASH_ProgramByte
+   \   000003 BE ..        LDW       X, S:?w6
+   \   000005 1C 0004      ADDW      X, #0x4
+   \   000008 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine37:
+   \   000000 CD ....      CALL      L:?Subroutine57
+   \                     ??CrossCallReturnLabel_123:
+   \   000003 BE ..        LDW       X, S:?w6
+   \   000005 1C 0003      ADDW      X, #0x3
+   \   000008 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine36:
+   \   000000 CD ....      CALL      L:FLASH_ProgramByte
+   \   000003 BE ..        LDW       X, S:?w6
+   \   000005 1C 0002      ADDW      X, #0x2
+   \   000008 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine22:
+   \   000000 CD ....      CALL      L:?Subroutine46
+   \                     ??CrossCallReturnLabel_106:
+   \   000003 BF ..        LDW       S:?w6, X
+   \   000005 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine46:
+   \   000000 AE 0005      LDW       X, #0x5
+   \   000003 BF ..        LDW       S:?w0, X
+   \   000005 93           LDW       X, Y
+   \   000006 CD ....      CALL      L:?mul16_x_x_w0
+   \   000009 1C ....      ADDW      X, #ABIO_Function
+   \   00000C 81           RET
+    597          
+    598          
+    599          /**
+    600          @function： 远程学习  将一路数据全部写入Flash中 
+    601          @parameter：ABIOT 参数
+    602          @parameter：Line_num 对应执行器的回路1 或 2
+    603          @parameter：LearnedIdNum 对应Flash中条目的编号（从0开始计数）
+    604          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    605          void ControlByAirLearn_NewWriteInFlash(INT8U AI_Data,INT8U AO_Data,INT8U BI_Data,INT8U BO_Data,INT8U Toogle_Data,INT8U Line_num ,INT8U LearnedIdNum)
+    606          {
+   \                     ControlByAirLearn_NewWriteInFlash:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 CD ....      CALL      L:?push_l3
+   \   000006 3B ....      PUSH      S:?b1
+   \   000009 3B ....      PUSH      S:?b2
+   \   00000C 3B ....      PUSH      S:?b3
+   \   00000F B7 ..        LD        S:?b14, A
+   \   000011 45 .. ..     MOV       S:?b15, S:?b0
+   \   000014 45 .. ..     MOV       S:?b8, S:?b4
+   \   000017 45 .. ..     MOV       S:?b9, S:?b5
+    607              FLASH_Unlock(FLASH_MemType_Data);   //解锁Flash
+   \   00001A CD ....      CALL      L:?Subroutine17
+    608              timer2_delay(1);
+    609              
+    610              uclong need_adress;
+    611              
+    612              if(Line_num == LINE_1)
+   \                     ??CrossCallReturnLabel_146:
+   \   00001D B6 ..        LD        A, S:?b8
+   \   00001F A1 16        CP        A, #0x16
+   \   000021 26 5B        JRNE      L:??ControlByAirLearn_NewWriteInFlash_0
+    613              {
+    614                  need_adress = (IDSTARTADDRESS + 0x10 * LearnedIdNum + 0x4);
+   \   000023 5F           CLRW      X
+   \   000024 41           EXG       A, XL
+   \   000025 B6 ..        LD        A, S:?b9
+   \   000027 41           EXG       A, XL
+   \   000028 BF ..        LDW       S:?w6, X
+   \   00002A CD ....      CALL      L:?sll16_x_x_4
+   \   00002D CD ....      CALL      L:?Subroutine40
+    615                  FLASH_ProgramByte(need_adress,AI_Data);                 // AI_Data 写入Flash 中AI_Line1 位置
+   \                     ??CrossCallReturnLabel_151:
+   \   000030 B6 ..        LD        A, S:?b14
+   \   000032 CD ....      CALL      L:FLASH_ProgramByte
+    616                  ABIO_Function[LearnedIdNum].AI_Line1 = AI_Data;         //写入用于本地使用的数组        
+   \   000035 AE 0005      LDW       X, #0x5
+   \   000038 BF ..        LDW       S:?w0, X
+   \   00003A BE ..        LDW       X, S:?w6
+   \   00003C CD ....      CALL      L:?mul16_x_x_w0
+   \   00003F 1C ....      ADDW      X, #ABIO_Function
+   \   000042 BF ..        LDW       S:?w6, X
+   \   000044 B6 ..        LD        A, S:?b14
+   \   000046 92C7 ..      LD        [S:?w6.w], A
+    617                  need_adress++;
+   \   000049 CD ....      CALL      L:?inc32_l2_l2
+    618                  FLASH_ProgramByte(need_adress,AO_Data);
+   \   00004C B6 ..        LD        A, S:?b15
+   \   00004E CD ....      CALL      L:?Subroutine39
+    619                  ABIO_Function[LearnedIdNum].AO_Line1 = AO_Data; 
+   \                     ??CrossCallReturnLabel_93:
+   \   000051 BE ..        LDW       X, S:?w6
+   \   000053 5C           INCW      X
+   \   000054 B6 ..        LD        A, S:?b15
+   \   000056 F7           LD        (X), A
+    620                  need_adress++;
+   \   000057 CD ....      CALL      L:?inc32_l2_l2
+    621                  FLASH_ProgramByte(need_adress,BI_Data);
+   \   00005A 7B 03        LD        A, (0x3,SP)
+   \   00005C CD ....      CALL      L:?mov_l0_l2
+   \   00005F CD ....      CALL      L:?Subroutine36
+    622                  ABIO_Function[LearnedIdNum].BI_Line1 = BI_Data; 
+   \                     ??CrossCallReturnLabel_85:
+   \   000062 7B 03        LD        A, (0x3,SP)
+   \   000064 F7           LD        (X), A
+    623                  need_adress++;        
+   \   000065 CD ....      CALL      L:?inc32_l2_l2
+    624                  FLASH_ProgramByte(need_adress,BO_Data);
+   \   000068 7B 02        LD        A, (0x2,SP)
+   \   00006A CD ....      CALL      L:?Subroutine37
+   \                     ??CrossCallReturnLabel_87:
+   \   00006D 7B 02        LD        A, (0x2,SP)
+   \   00006F F7           LD        (X), A
+    625                  ABIO_Function[LearnedIdNum].BO_Line1 = BO_Data; 
+    626                  need_adress++;      
+    627                  FLASH_ProgramByte(need_adress,Toogle_Data);
+   \   000070 7B 01        LD        A, (0x1,SP)
+   \   000072 CD ....      CALL      L:?inc32_l2_l2
+   \   000075 CD ....      CALL      L:?mov_l0_l2
+   \   000078 CD ....      CALL      L:?Subroutine38
+    628                  ABIO_Function[LearnedIdNum].TOOGLE_Line1 = Toogle_Data; 
+   \                     ??CrossCallReturnLabel_89:
+   \   00007B 7B 01        LD        A, (0x1,SP)
+   \   00007D F7           LD        (X), A
+    629                  need_adress++;                  
+    630              }
+    631          
+    632              FLASH_Lock(FLASH_MemType_Data);   //锁定Flash
+   \                     ??ControlByAirLearn_NewWriteInFlash_0:
+   \   00007E CD ....      CALL      L:?Subroutine34
+    633          }
+   \                     ??CrossCallReturnLabel_80:
+   \   000081 5B 03        ADD       SP, #0x3
+   \   000083 CC ....      JP        L:?epilogue_l2_l3
+    634          
+    635          
+    636          /**
+    637          @function： 远程学习中  删除一个条目后  对Flash中数据排位进行   更新  
+    638          @parameter：对应Flash中条目的编号（从0开始计数）
+    639          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    640          void UpdateDatasAdressInFlash(INT8U NumOfDeleteData)
+    641          {
+   \                     UpdateDatasAdressInFlash:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 CD ....      CALL      L:?push_l3
+   \   000006 52 03        SUB       SP, #0x3
+   \   000008 B7 ..        LD        S:?b12, A
+    642              INT8U  i,j =0;
+    643              INT8U  need_num;
+    644              uclong need_adress;
+    645              INT16U flash_start = IDSTARTADDRESS; 
+   \   00000A AE 1010      LDW       X, #0x1010
+   \   00000D 1F 02        LDW       (0x2,SP), X
+    646              FLASH_Unlock(FLASH_MemType_Data);   //解锁Flash
+   \   00000F CD ....      CALL      L:?Subroutine16
+    647              timer2_delay(1); 
+    648              
+    649              INT8U  numNeedMove = 0;
+    650              numNeedMove = Public_learned_ID_num - NumOfDeleteData;
+    651              numNeedMove = numNeedMove - 1;
+   \                     ??CrossCallReturnLabel_42:
+   \   000012 B0 ..        SUB       A, S:?b12
+   \   000014 4A           DEC       A
+   \   000015 6B 01        LD        (0x1,SP), A
+    652                    
+    653              need_adress = (IDSTARTADDRESS + 0x10 * NumOfDeleteData);
+   \   000017 5F           CLRW      X
+   \   000018 41           EXG       A, XL
+   \   000019 B6 ..        LD        A, S:?b12
+   \   00001B 41           EXG       A, XL
+   \   00001C CD ....      CALL      L:?sll16_x_x_4
+   \   00001F 1C 1010      ADDW      X, #0x1010
+   \   000022 CD ....      CALL      L:??Subroutine66_0
+    654              need_num = NumOfDeleteData+1;    
+   \                     ??CrossCallReturnLabel_148:
+   \   000025 B6 ..        LD        A, S:?b12
+   \   000027 4C           INC       A
+   \   000028 B7 ..        LD        S:?b14, A
+    655              for(i = 0 ; i < numNeedMove ; i++)
+   \   00002A 3F ..        CLR       S:?b15
+   \   00002C 20 3F        JRA       L:??UpdateDatasAdressInFlash_0
+   \                     ??UpdateDatasAdressInFlash_1:
+   \   00002E 905F         CLRW      Y
+   \   000030 61           EXG       A, YL
+   \   000031 B6 ..        LD        A, S:?b14
+   \   000033 61           EXG       A, YL
+   \   000034 CD ....      CALL      L:?Subroutine49
+   \                     ??CrossCallReturnLabel_139:
+   \   000037 BF ..        LDW       S:?w6, X
+   \   000039 CD ....      CALL      L:?Subroutine25
+    656              {
+    657                  //ID区域
+    658                  FLASH_ProgramByte(need_adress,AllRadio[need_num].Id_part_1);
+    659                  need_adress++;
+    660                  FLASH_ProgramByte(need_adress,AllRadio[need_num].Id_part_2);
+    661                  need_adress++;
+    662                  FLASH_ProgramByte(need_adress,AllRadio[need_num].Id_part_3);
+    663                  need_adress++;
+    664                  FLASH_ProgramByte(need_adress,AllRadio[need_num].Id_part_4);
+    665                  need_adress++;        
+   \                     ??CrossCallReturnLabel_57:
+   \   00003C CD ....      CALL      L:?inc32_l2_l2
+    666                  // Line1 区域
+    667                  FLASH_ProgramByte(need_adress,ABIO_Function[need_num].AI_Line1);
+   \   00003F 905F         CLRW      Y
+   \   000041 61           EXG       A, YL
+   \   000042 B6 ..        LD        A, S:?b14
+   \   000044 61           EXG       A, YL
+   \   000045 CD ....      CALL      L:?Subroutine22
+   \                     ??CrossCallReturnLabel_51:
+   \   000048 92C6 ..      LD        A, [S:?w6.w]
+   \   00004B CD ....      CALL      L:?Subroutine39
+    668                  need_adress++;
+   \                     ??CrossCallReturnLabel_91:
+   \   00004E CD ....      CALL      L:?inc32_l2_l2
+    669                  FLASH_ProgramByte(need_adress,ABIO_Function[need_num].AO_Line1);
+   \   000051 BE ..        LDW       X, S:?w6
+   \   000053 CD ....      CALL      L:?Subroutine25
+    670                  need_adress++;
+    671                  FLASH_ProgramByte(need_adress,ABIO_Function[need_num].BI_Line1);
+    672                  need_adress++;
+    673                  FLASH_ProgramByte(need_adress,ABIO_Function[need_num].BO_Line1);   
+    674                  need_adress++;
+    675                  FLASH_ProgramByte(need_adress,ABIO_Function[need_num].TOOGLE_Line1);
+    676                  need_adress++;
+    677          
+    678                  need_adress+=0x7; 
+   \                     ??CrossCallReturnLabel_58:
+   \   000056 CD ....      CALL      L:?mov_l0_l2
+   \   000059 CD ....      CALL      L:?add32_l0_l0_dl
+   \   00005C 00000008     DC32      0x8
+   \   000060 CD ....      CALL      L:?mov_l2_l0
+    679                  need_num++;
+   \   000063 B6 ..        LD        A, S:?b14
+   \   000065 4C           INC       A
+   \   000066 B7 ..        LD        S:?b14, A
+    680              }  
+   \   000068 B6 ..        LD        A, S:?b15
+   \   00006A 4C           INC       A
+   \   00006B B7 ..        LD        S:?b15, A
+   \                     ??UpdateDatasAdressInFlash_0:
+   \   00006D B6 ..        LD        A, S:?b15
+   \   00006F 11 01        CP        A, (0x1,SP)
+   \   000071 25 BB        JRC       L:??UpdateDatasAdressInFlash_1
+    681              //将原来排在最后的删除
+    682              need_adress = (IDSTARTADDRESS + 0x10 * (Public_learned_ID_num-1));
+   \   000073 C6 ....      LD        A, L:Public_learned_ID_num
+   \   000076 5F           CLRW      X
+   \   000077 97           LD        XL, A
+   \   000078 CD ....      CALL      L:?sll16_x_x_4
+   \   00007B 1C 1000      ADDW      X, #0x1000
+   \   00007E CD ....      CALL      L:??Subroutine66_0
+    683              for(j=0;j<0x10;j++)
+   \                     ??CrossCallReturnLabel_149:
+   \   000081 35 10 ....   MOV       S:?b12, #0x10
+    684              {
+    685                  FLASH_ProgramByte(need_adress,0x00);
+   \                     ??UpdateDatasAdressInFlash_2:
+   \   000085 4F           CLR       A
+   \   000086 CD ....      CALL      L:?Subroutine39
+    686                  need_adress++;    
+   \                     ??CrossCallReturnLabel_92:
+   \   000089 CD ....      CALL      L:?inc32_l2_l2
+    687              }
+   \   00008C B6 ..        LD        A, S:?b12
+   \   00008E 4A           DEC       A
+   \   00008F B7 ..        LD        S:?b12, A
+   \   000091 26 F2        JRNE      L:??UpdateDatasAdressInFlash_2
+    688                  
+    689              //更新已学习数量在Flash中的数据
+    690              FLASH_ProgramByte(NEWIDADDRESSINFLASH_PART_2,0x10*Public_learned_ID_num);
+   \   000093 C6 ....      LD        A, L:Public_learned_ID_num
+   \   000096 4E           SWAP      A
+   \   000097 A4 F0        AND       A, #0xf0
+   \   000099 AE 1006      LDW       X, #0x1006
+   \   00009C CD ....      CALL      L:??Subroutine70_0
+    691              Public_learned_ID_num--;
+   \                     ??CrossCallReturnLabel_159:
+   \   00009F C6 ....      LD        A, L:Public_learned_ID_num
+   \   0000A2 4A           DEC       A
+   \   0000A3 CD ....      CALL      L:?Subroutine14
+    692              FLASH_ProgramByte(IDCOUNTADD,Public_learned_ID_num);     
+    693              
+    694              //更新本地数据     
+    695              Public_learned_ID_num = FLASH_ReadByte(IDCOUNTADD);
+   \                     ??CrossCallReturnLabel_156:
+   \   0000A6 CD ....      CALL      L:?Subroutine7
+    696              IdStartAddress = (FLASH_ReadByte(NEWIDADDRESSINFLASH_PART_1)<<8)+(FLASH_ReadByte(NEWIDADDRESSINFLASH_PART_2));    
+   \                     ??CrossCallReturnLabel_21:
+   \   0000A9 905F         CLRW      Y
+   \   0000AB 9097         LD        YL, A
+   \   0000AD 5F           CLRW      X
+   \   0000AE 41           EXG       A, XL
+   \   0000AF B6 ..        LD        A, S:?b8
+   \   0000B1 41           EXG       A, XL
+   \   0000B2 4F           CLR       A
+   \   0000B3 02           RLWA      X, A
+   \   0000B4 90BF ..      LDW       S:?w0, Y
+   \   0000B7 72BB ....    ADDW      X, S:?w0
+   \   0000BB CF ....      LDW       L:IdStartAddress, X
+    697              for(i = 0;i < MAXLEARNNUM;i++)           //注意数组溢出   0x1100 -- 0x110F                           
+   \   0000BE 3F ..        CLR       S:?b10
+    698              {
+    699                AllRadio[i].Id_part_1 = FLASH_ReadByte(flash_start);        //将Flash中ID读取到本地内存中
+   \                     ??UpdateDatasAdressInFlash_3:
+   \   0000C0 CD ....      CALL      L:?Subroutine19
+   \                     ??CrossCallReturnLabel_46:
+   \   0000C3 1E 02        LDW       X, (0x2,SP)
+   \   0000C5 CD ....      CALL      L:?Subroutine15
+   \                     ??CrossCallReturnLabel_40:
+   \   0000C8 BE ..        LDW       X, S:?w4
+   \   0000CA 5C           INCW      X
+   \   0000CB F7           LD        (X), A
+    700                flash_start++;
+   \   0000CC 1E 02        LDW       X, (0x2,SP)
+   \   0000CE CD ....      CALL      L:?Subroutine18
+    701                AllRadio[i].Id_part_2 = FLASH_ReadByte(flash_start);
+    702                flash_start++;
+    703                AllRadio[i].Id_part_3 = FLASH_ReadByte(flash_start);
+    704                flash_start++;
+    705                AllRadio[i].Id_part_4 = FLASH_ReadByte(flash_start);
+    706                flash_start++;
+    707                
+    708                ABIO_Function[i].AI_Line1 = FLASH_ReadByte(flash_start);    //将Flash中开关对应的动作读取到本地内存中
+    709                flash_start++;
+    710                ABIO_Function[i].AO_Line1 = FLASH_ReadByte(flash_start);
+    711                flash_start++;
+    712                ABIO_Function[i].BI_Line1 = FLASH_ReadByte(flash_start);
+    713                flash_start++;     
+    714                ABIO_Function[i].BO_Line1 = FLASH_ReadByte(flash_start);
+    715                flash_start++; 
+    716                ABIO_Function[i].TOOGLE_Line1 = FLASH_ReadByte(flash_start);
+    717                flash_start++;       
+    718                               
+    719                flash_start+=0x7;
+    720              }    
+   \                     ??CrossCallReturnLabel_44:
+   \   0000D1 1F 02        LDW       (0x2,SP), X
+   \   0000D3 B6 ..        LD        A, S:?b10
+   \   0000D5 4C           INC       A
+   \   0000D6 B7 ..        LD        S:?b10, A
+   \   0000D8 A1 0A        CP        A, #0xa
+   \   0000DA 25 E4        JRC       L:??UpdateDatasAdressInFlash_3
+    721                 
+    722              FLASH_Lock(FLASH_MemType_Data);   //锁定Flash  
+   \   0000DC CD ....      CALL      L:?Subroutine34
+    723          }
+   \                     ??CrossCallReturnLabel_81:
+   \   0000DF 5B 03        ADD       SP, #0x3
+   \   0000E1 CC ....      JP        L:?epilogue_l2_l3
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine25:
+   \   000000 5C           INCW      X
+   \   000001 CD ....      CALL      L:?Subroutine55
+   \                     ??CrossCallReturnLabel_117:
+   \   000004 1C 0002      ADDW      X, #0x2
+   \   000007 CD ....      CALL      L:?Subroutine55
+   \                     ??CrossCallReturnLabel_118:
+   \   00000A 1C 0003      ADDW      X, #0x3
+   \   00000D CD ....      CALL      L:?Subroutine55
+   \                     ??CrossCallReturnLabel_119:
+   \   000010 1C 0004      ADDW      X, #0x4
+   \   000013 F6           LD        A, (X)
+   \   000014 CD ....      CALL      L:?Subroutine57
+   \                     ??CrossCallReturnLabel_125:
+   \   000017 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine55:
+   \   000000 F6           LD        A, (X)
+   \   000001 CD ....      CALL      L:?mov_l0_l2
+   \   000004 CD ....      CALL      L:FLASH_ProgramByte
+   \   000007 CD ....      CALL      L:?inc32_l2_l2
+   \   00000A BE ..        LDW       X, S:?w6
+   \   00000C 81           RET
+    724          
+    725          
+    726          /**
+    727          @function：清空Flash 
+    728          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    729          void ClearFlash(void)
+    730          {
+   \                     ClearFlash:
+   \   000000 CD ....      CALL      L:?push_w4
+   \   000003 3B ....      PUSH      S:?b10
+    731              INT8U   i;
+    732              INT16U  add = IDSTARTADDRESS - 0x10;
+   \   000006 AE 1000      LDW       X, #0x1000
+   \   000009 BF ..        LDW       S:?w4, X
+    733              FLASH_Unlock(FLASH_MemType_Data);                     //解锁Flash
+   \   00000B CD ....      CALL      L:?Subroutine17
+    734              timer2_delay(1); 
+    735              FLASH_ProgramByte(IFFIRSTPOWERNUMADRESS,0x00);           //清空Flash相关的参数
+   \                     ??CrossCallReturnLabel_147:
+   \   00000E 4F           CLR       A
+   \   00000F AE 1002      LDW       X, #0x1002
+   \   000012 CD ....      CALL      L:?Subroutine11
+   \                     ??CrossCallReturnLabel_34:
+   \   000015 AE 1005      LDW       X, #0x1005
+   \   000018 CD ....      CALL      L:?Subroutine13
+   \                     ??CrossCallReturnLabel_38:
+   \   00001B AE 1006      LDW       X, #0x1006
+   \   00001E CD ....      CALL      L:?Subroutine13
+    736              FLASH_ProgramByte(NEWIDADDRESSINFLASH_PART_1,0x10);
+    737              FLASH_ProgramByte(NEWIDADDRESSINFLASH_PART_2,0x00);
+    738              FLASH_ProgramByte(IDCOUNTADD,0x00);
+   \                     ??CrossCallReturnLabel_39:
+   \   000021 CD ....      CALL      L:??Subroutine69_0
+    739              for(i = 0 ; i <= MAXLEARNNUM * 0x10 ; i++)
+   \                     ??CrossCallReturnLabel_158:
+   \   000024 35 A1 ....   MOV       S:?b10, #0xa1
+    740              {
+    741                  FLASH_ProgramByte(add,0x00);
+   \                     ??ClearFlash_0:
+   \   000028 4F           CLR       A
+   \   000029 CD ....      CALL      L:?mov_w1_w4
+   \   00002C CD ....      CALL      L:??Subroutine71_0
+    742                 // IWDG_ReloadCounter();    //喂狗
+    743                  add ++ ;  
+   \                     ??CrossCallReturnLabel_163:
+   \   00002F BE ..        LDW       X, S:?w4
+   \   000031 5C           INCW      X
+   \   000032 BF ..        LDW       S:?w4, X
+    744              }
+   \   000034 B6 ..        LD        A, S:?b10
+   \   000036 4A           DEC       A
+   \   000037 B7 ..        LD        S:?b10, A
+   \   000039 26 ED        JRNE      L:??ClearFlash_0
+    745              for(i = 0 ; i < MAXLEARNNUM ; i ++)
+   \   00003B 3F ..        CLR       S:?b2
+    746              {   //清空本地中的数据
+    747                  AllRadio[i].Id_part_1 = 0x00; 
+   \                     ??ClearFlash_1:
+   \   00003D 905F         CLRW      Y
+   \   00003F 61           EXG       A, YL
+   \   000040 B6 ..        LD        A, S:?b2
+   \   000042 CD ....      CALL      L:?Subroutine21
+   \                     ??CrossCallReturnLabel_137:
+   \   000045 4F           CLR       A
+   \   000046 CD ....      CALL      L:?Subroutine31
+    748                  AllRadio[i].Id_part_2 = 0x00;
+   \                     ??CrossCallReturnLabel_133:
+   \   000049 CD ....      CALL      L:?Subroutine33
+    749                  AllRadio[i].Id_part_3 = 0x00;
+   \                     ??CrossCallReturnLabel_130:
+   \   00004C 90F7         LD        (Y), A
+    750                  AllRadio[i].Id_part_4 = 0x00;
+   \   00004E 1C 0004      ADDW      X, #0x4
+   \   000051 F7           LD        (X), A
+    751              }
+   \   000052 B6 ..        LD        A, S:?b2
+   \   000054 4C           INC       A
+   \   000055 B7 ..        LD        S:?b2, A
+   \   000057 A1 0A        CP        A, #0xa
+   \   000059 25 E2        JRC       L:??ClearFlash_1
+    752                 
+    753              FLASH_Lock(FLASH_MemType_Data);                       //锁定Flash
+   \   00005B CD ....      CALL      L:?Subroutine34
+    754          }
+   \                     ??CrossCallReturnLabel_82:
+   \   00005E 32 ....      POP       S:?b10
+   \   000061 CC ....      JP        L:?epilogue_w4
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine13:
+   \   000000 CD ....      CALL      L:?Subroutine53
+   \                     ??CrossCallReturnLabel_166:
+   \   000003 4F           CLR       A
+   \   000004 81           RET
+    755          
+    756          
+    757          /**
+    758          @function：将设备自身信息广播 
+    759          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    760          void Broadcast_info(void)
+    761          {
+   \                     Broadcast_info:
+   \   000000 52 06        SUB       SP, #0x6
+    762              INT8U broadcast_data[6]={0x1,DEVICE_ID_4,DEVICE_ID_3,DEVICE_ID_2,DEVICE_ID_1,DEVICE_TYPE};
+   \   000002 90AE ....    LDW       Y, #?_0
+   \   000006 96           LDW       X, SP
+   \   000007 5C           INCW      X
+   \   000008 89           PUSHW     X
+   \   000009 A6 06        LD        A, #0x6
+   \   00000B CD ....      CALL      L:?move1616_v_x_y_a
+   \   00000E 85           POPW      X
+    763              halRfSendPacket( broadcast_data, 6 );
+   \   00000F A6 06        LD        A, #0x6
+   \   000011 96           LDW       X, SP
+   \   000012 5C           INCW      X
+   \   000013 CD ....      CALL      L:halRfSendPacket
+    764          }
+   \   000016 5B 06        ADD       SP, #0x6
+   \   000018 81           RET
+    765          
+    766          /**
+    767          @function：学习模式中  按键 & 指示灯  处理函数 
+    768          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine6:
+   \   000000 A6 10        LD        A, #0x10
+   \   000002 AE 500A      LDW       X, #0x500a
+   \   000005 CC ....      JP        L:GPIO_SetBits
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    769          void LearnMode_Function(void)
+    770          {
+    771              INT8U findInFlashReturnAdress = 0;
+                           ^
+Warning[Pe177]: variable "findInFlashReturnAdress" was declared but never
+          referenced
+    772              if(learn_mode == ON )
+   \                     LearnMode_Function:
+   \   000000 CD ....      CALL      L:?Subroutine27
+   \                     ??CrossCallReturnLabel_63:
+   \   000003 26 6F        JRNE      L:??LearnMode_Function_0
+    773              {
+    774                  /* 学习模式时 LED指示灯与继电器提示  */
+    775                  if(led_blink_time == 0x50)
+   \   000005 C6 ....      LD        A, L:led_blink_time
+   \   000008 A1 50        CP        A, #0x50
+   \   00000A 26 24        JRNE      L:??CrossCallReturnLabel_55
+    776                  { 
+    777                      led_blink_time = 0;
+   \   00000C 725F ....    CLR       L:led_blink_time
+    778                      if(GPIO_ReadOutputDataBit(LINE1_PORT, LINE1_PIN) == 0 )
+   \   000010 CD ....      CALL      L:?Subroutine29
+   \                     ??CrossCallReturnLabel_70:
+   \   000013 CD ....      CALL      L:GPIO_ReadOutputDataBit
+   \   000016 A1 00        CP        A, #0x0
+   \   000018 26 13        JRNE      L:??LearnMode_Function_1
+    779                      {
+    780                          OPEN_LINE1;
+   \   00001A CD ....      CALL      L:?Subroutine6
+    781                          if(LearnModeWaitForConfirm == OFF)
+   \                     ??CrossCallReturnLabel_17:
+   \   00001D C6 ....      LD        A, L:LearnModeWaitForConfirm
+   \   000020 A1 10        CP        A, #0x10
+   \   000022 27 04        JREQ      L:??LearnMode_Function_2
+    782                          {LED1_GREEN;}
+    783                          else  if(LearnModeWaitForConfirm == ON)           //处于等待学习确认阶段，闪蓝色LED
+   \   000024 A1 11        CP        A, #0x11
+   \   000026 26 08        JRNE      L:??CrossCallReturnLabel_55
+    784                          {LED1_BLUE;}
+   \                     ??LearnMode_Function_2:
+   \   000028 CD ....      CALL      L:?Subroutine3
+    785                      }
+   \                     ??CrossCallReturnLabel_9:
+   \   00002B 20 03        JRA       L:??CrossCallReturnLabel_55
+    786                      else
+    787                      {
+    788                          CLOSE_LINE1;
+   \                     ??LearnMode_Function_1:
+   \   00002D CD ....      CALL      L:?Subroutine24
+    789                          Led1_Off();
+    790                      }               
+    791                  }        
+    792               
+    793                  /*  学习模式时，用于确认 */
+    794                  if((Key1_Short_Pushed == 1) && (LearnModeWaitForConfirm == ON))               //若key1按键按下，则已经确认，则将报文信息写入Flash
+   \                     ??CrossCallReturnLabel_55:
+   \   000030 C6 ....      LD        A, L:Key1_Short_Pushed
+   \   000033 A1 01        CP        A, #0x1
+   \   000035 26 3D        JRNE      L:??LearnMode_Function_0
+   \   000037 C6 ....      LD        A, L:LearnModeWaitForConfirm
+   \   00003A A1 11        CP        A, #0x11
+   \   00003C 26 36        JRNE      L:??LearnMode_Function_0
+    795                  {
+    796                      TIM4_Cmd(DISABLE);                     //关闭定时器                  
+   \   00003E 4F           CLR       A
+   \   00003F CD ....      CALL      L:TIM4_Cmd
+    797                      LearnModeWaitForConfirm = OFF;         //已经确认，取消等待状态
+   \   000042 35 10 ....   MOV       L:LearnModeWaitForConfirm, #0x10
+    798                      learn_mode              = OFF;         //退出学习模式，进入工作模式 
+   \   000046 35 10 ....   MOV       L:learn_mode, #0x10
+    799                      SaveInfoInFlash();                     //保存信息  ************          
+   \   00004A CD ....      CALL      L:SaveInfoInFlash
+    800                      Key1_Short_Pushed = 0;
+   \   00004D 725F ....    CLR       L:Key1_Short_Pushed
+   \   000051 20 16        JRA       L:??LearnMode_Function_3
+    801                                
+    802                      //led提示写入成功               
+    803                      while(led_flash < 3)
+    804                      {
+    805                          LED1_GREEN;
+   \                     ??LearnMode_Function_4:
+   \   000053 CD ....      CALL      L:?Subroutine2
+    806                          timer2_delay(100);            
+   \                     ??CrossCallReturnLabel_6:
+   \   000056 CD ....      CALL      L:timer2_delay
+    807                          Led1_Off();
+   \   000059 CD ....      CALL      L:Led1_Off
+    808                          timer2_delay(100);
+   \   00005C AE 0064      LDW       X, #0x64
+   \   00005F CD ....      CALL      L:?Subroutine8
+    809                          led_flash++;
+   \                     ??CrossCallReturnLabel_24:
+   \   000062 C6 ....      LD        A, L:led_flash
+   \   000065 4C           INC       A
+   \   000066 C7 ....      LD        L:led_flash, A
+    810                      }
+   \                     ??LearnMode_Function_3:
+   \   000069 C6 ....      LD        A, L:led_flash
+   \   00006C A1 03        CP        A, #0x3
+   \   00006E 25 E3        JRC       L:??LearnMode_Function_4
+    811                      led_flash = 0;                                
+   \   000070 725F ....    CLR       L:led_flash
+    812                  }                          
+    813              }
+    814          }
+   \                     ??LearnMode_Function_0:
+   \   000074 81           RET
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine24:
+   \   000000 A6 10        LD        A, #0x10
+   \   000002 AE 500A      LDW       X, #0x500a
+   \   000005 CD ....      CALL      L:GPIO_ResetBits
+   \   000008 CC ....      JP        L:Led1_Off
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine2:
+   \   000000 CD ....      CALL      L:?Subroutine47
+   \                     ??CrossCallReturnLabel_107:
+   \   000003 AE 0064      LDW       X, #0x64
+   \   000006 CD ....      CALL      L:?Subroutine59
+   \                     ??CrossCallReturnLabel_126:
+   \   000009 81           RET
+    815          
+    816          
+    817          /**
+    818          @function：学习模式中  确认后，保存信息 
+    819          **/
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+    820          void SaveInfoInFlash(void)
+    821          {
+   \                     SaveInfoInFlash:
+   \   000000 CD ....      CALL      L:?push_l2
+    822              FindIdInFlash_return_num = FindIdInFlash(Radio_Data[1],Radio_Data[2],Radio_Data[3],Radio_Data[4]);   //在本地查找是否已经记录过该ID对应的设备
+   \   000003 C6 ....      LD        A, L:Radio_Data + 1
+   \   000006 B7 ..        LD        S:?b8, A
+   \   000008 C6 ....      LD        A, L:Radio_Data + 2
+   \   00000B B7 ..        LD        S:?b9, A
+   \   00000D C6 ....      LD        A, L:Radio_Data + 3
+   \   000010 B7 ..        LD        S:?b10, A
+   \   000012 C6 ....      LD        A, L:Radio_Data + 4
+   \   000015 B7 ..        LD        S:?b11, A
+   \   000017 CD ....      CALL      L:?Subroutine35
+   \                     ??CrossCallReturnLabel_83:
+   \   00001A CD ....      CALL      L:FindIdInFlash
+   \   00001D C7 ....      LD        L:FindIdInFlash_return_num, A
+    823                             
+    824              if(FindIdInFlash_return_num == FINDINFLASH_FAIL)                             //在Flash中没有找到ID,这是一个新的开关   
+   \   000020 A1 77        CP        A, #0x77
+   \   000022 26 0C        JRNE      L:??SaveInfoInFlash_0
+    825              {   
+    826                  WriteIdInFlash(Radio_Data[1],Radio_Data[2],Radio_Data[3],Radio_Data[4]);                         //将ID写入Flash
+   \   000024 CD ....      CALL      L:?Subroutine35
+   \                     ??CrossCallReturnLabel_84:
+   \   000027 CD ....      CALL      L:WriteIdInFlash
+    827                  IdNum = Public_learned_ID_num - 1;
+   \   00002A C6 ....      LD        A, L:Public_learned_ID_num
+   \   00002D 4A           DEC       A
+   \   00002E 20 04        JRA       L:??SaveInfoInFlash_1
+    828              }
+    829              else if( FindIdInFlash_return_num <= MAXLEARNNUM )
+   \                     ??SaveInfoInFlash_0:
+   \   000030 A1 0B        CP        A, #0xb
+   \   000032 24 03        JRNC      L:??SaveInfoInFlash_2
+   \                     ??SaveInfoInFlash_1:
+   \   000034 C7 ....      LD        L:IdNum, A
+    830              {                 
+    831                  IdNum = FindIdInFlash_return_num;
+    832              }                      
+    833                  //TODO 将开关的按键操作写入Flash
+    834              switch(Radio_Data[6])      //开关中的DATA位包含按键的键值   
+   \                     ??SaveInfoInFlash_2:
+   \   000037 C6 ....      LD        A, L:Radio_Data + 6
+   \   00003A A1 10        CP        A, #0x10
+   \   00003C 27 12        JREQ      L:??SaveInfoInFlash_3
+   \   00003E A1 20        CP        A, #0x20
+   \   000040 27 20        JREQ      L:??SaveInfoInFlash_4
+   \   000042 A1 30        CP        A, #0x30
+   \   000044 27 0A        JREQ      L:??SaveInfoInFlash_3
+   \   000046 A1 50        CP        A, #0x50
+   \   000048 27 0F        JREQ      L:??SaveInfoInFlash_5
+   \   00004A A1 70        CP        A, #0x70
+   \   00004C 27 0B        JREQ      L:??SaveInfoInFlash_5
+   \   00004E 20 1C        JRA       L:??SaveInfoInFlash_6
+    835              {
+    836                  case AI:       //AI
+    837                  {  WriteKeyOperationInFlash(A_LINE1,IdNum);  break;}                                                           
+    838                  case AO:       //AO
+    839                  {  WriteKeyOperationInFlash(A_LINE1,IdNum);  break;}                                                              
+   \                     ??SaveInfoInFlash_3:
+   \   000050 C6 ....      LD        A, L:IdNum
+   \   000053 B7 ..        LD        S:?b0, A
+   \   000055 A6 11        LD        A, #0x11
+   \   000057 20 10        JRA       L:??SaveInfoInFlash_7
+    840                  case BI:       //BI
+    841                  {  WriteKeyOperationInFlash(B_LINE1,IdNum);  break;}                             
+    842                  case BO:       //BO
+    843                  {  WriteKeyOperationInFlash(B_LINE1,IdNum);  break;} 
+   \                     ??SaveInfoInFlash_5:
+   \   000059 C6 ....      LD        A, L:IdNum
+   \   00005C B7 ..        LD        S:?b0, A
+   \   00005E A6 12        LD        A, #0x12
+   \   000060 20 07        JRA       L:??SaveInfoInFlash_7
+    844                                       
+    845                  case ABIO_TOOGLE:       
+    846                  {  WriteKeyOperationInFlash(ABIO_TOOGLE_LINE1,IdNum);  break;  }               
+   \                     ??SaveInfoInFlash_4:
+   \   000062 C6 ....      LD        A, L:IdNum
+   \   000065 B7 ..        LD        S:?b0, A
+   \   000067 A6 18        LD        A, #0x18
+   \                     ??SaveInfoInFlash_7:
+   \   000069 CD ....      CALL      L:WriteKeyOperationInFlash
+    847                  default:{}                            
+    848              }                      
+    849              OPEN_LINE1;          //打开Line1
+   \                     ??SaveInfoInFlash_6:
+   \   00006C CD ....      CALL      L:?Subroutine6
+    850              Led1_Off();          //关闭两个LED灯                                
+   \                     ??CrossCallReturnLabel_18:
+   \   00006F CD ....      CALL      L:Led1_Off
+    851          }
+   \   000072 CC ....      JP        L:?epilogue_l2
+
+   \                                 In section .near_func.text, align 1, keep-with-next
+   \                     ?Subroutine35:
+   \   000000 45 .. ..     MOV       S:?b2, S:?b11
+   \   000003 45 .. ..     MOV       S:?b1, S:?b10
+   \   000006 45 .. ..     MOV       S:?b0, S:?b9
+   \   000009 B6 ..        LD        A, S:?b8
+   \   00000B 81           RET
+    852          
+    853          
+    854          
+    855          
+    856          /**
+    857          @function： 应答请求  设备Flash中已存  所有  信息报文  
+    858          @parameter：AdressOfData  信息条目的编号 从0开始
+    859          **/
+
+   \                                 In section .near_func.text, align 1
+    860          void Reply_RequestFlashData(INT8U AdressOfData,INT8U Master_Id_1,INT8U Master_Id_2,INT8U Master_Id_3,INT8U Master_Id_4)
+    861          {     
+   \                     Reply_RequestFlashData:
+   \   000000 52 13        SUB       SP, #0x13
+   \   000002 B7 ..        LD        S:?b4, A
+    862              //回复请求端的数据                        目标设备ID                设备自身ID                                      ID区域                   Line1区域             
+    863              INT8U  Reply_ALL_DataInFlash[19] = {0x6 ,0x00,0x00,0x00,0x00,0x00,DEVICE_ID_1,DEVICE_ID_2,DEVICE_ID_3,DEVICE_ID_4,0x00,0x00,0x00,0x00,  0x00,0x00,0x00,0x00,0x00};     
+   \   000004 90AE ....    LDW       Y, #?_1
+   \   000008 96           LDW       X, SP
+   \   000009 5C           INCW      X
+   \   00000A 89           PUSHW     X
+   \   00000B A6 13        LD        A, #0x13
+   \   00000D CD ....      CALL      L:?move1616_v_x_y_a
+   \   000010 85           POPW      X
+    864              const INT8U  adressofstruct = AdressOfData;
+    865                                           
+    866              if(adressofstruct < Public_learned_ID_num)
+   \   000011 B6 ..        LD        A, S:?b4
+   \   000013 C1 ....      CP        A, L:Public_learned_ID_num
+   \   000016 24 6A        JRNC      L:??Reply_RequestFlashData_0
+    867              {
+    868                   //主机ID
+    869                   Reply_ALL_DataInFlash[1] = Master_Id_1;
+   \   000018 B6 ..        LD        A, S:?b0
+   \   00001A 6B 02        LD        (0x2,SP), A
+    870                   Reply_ALL_DataInFlash[2] = Master_Id_2;
+   \   00001C B6 ..        LD        A, S:?b1
+   \   00001E 6B 03        LD        (0x3,SP), A
+    871                   Reply_ALL_DataInFlash[3] = Master_Id_3;
+   \   000020 B6 ..        LD        A, S:?b2
+   \   000022 6B 04        LD        (0x4,SP), A
+    872                   Reply_ALL_DataInFlash[4] = Master_Id_4;
+   \   000024 B6 ..        LD        A, S:?b3
+   \   000026 6B 05        LD        (0x5,SP), A
+    873                   
+    874                   Reply_ALL_DataInFlash[5] = adressofstruct;
+   \   000028 B6 ..        LD        A, S:?b4
+   \   00002A 6B 06        LD        (0x6,SP), A
+    875                   //Flash中数据区域
+    876                   Reply_ALL_DataInFlash[10] = AllRadio[adressofstruct].Id_part_1; 
+   \   00002C 5F           CLRW      X
+   \   00002D 41           EXG       A, XL
+   \   00002E BF ..        LDW       S:?w1, X
+   \   000030 AE 0007      LDW       X, #0x7
+   \   000033 CD ....      CALL      L:?Subroutine23
+   \                     ??CrossCallReturnLabel_53:
+   \   000036 1C ....      ADDW      X, #AllRadio
+   \   000039 9093         LDW       Y, X
+   \   00003B 905C         INCW      Y
+   \   00003D 90F6         LD        A, (Y)
+   \   00003F 6B 0B        LD        (0xb,SP), A
+    877                   Reply_ALL_DataInFlash[11] = AllRadio[adressofstruct].Id_part_2;
+   \   000041 CD ....      CALL      L:?Subroutine30
+   \                     ??CrossCallReturnLabel_73:
+   \   000044 6B 0C        LD        (0xc,SP), A
+    878                   Reply_ALL_DataInFlash[12] = AllRadio[adressofstruct].Id_part_3;
+   \   000046 CD ....      CALL      L:?Subroutine32
+   \                     ??CrossCallReturnLabel_75:
+   \   000049 6B 0D        LD        (0xd,SP), A
+    879                   Reply_ALL_DataInFlash[13] = AllRadio[adressofstruct].Id_part_4;
+   \   00004B 1C 0004      ADDW      X, #0x4
+   \   00004E F6           LD        A, (X)
+   \   00004F 6B 0E        LD        (0xe,SP), A
+    880                   
+    881                   Reply_ALL_DataInFlash[14] = ABIO_Function[adressofstruct].AI_Line1;
+   \   000051 AE 0005      LDW       X, #0x5
+   \   000054 CD ....      CALL      L:?Subroutine23
+   \                     ??CrossCallReturnLabel_54:
+   \   000057 1C ....      ADDW      X, #ABIO_Function
+   \   00005A F6           LD        A, (X)
+   \   00005B 6B 0F        LD        (0xf,SP), A
+    882                   Reply_ALL_DataInFlash[15] = ABIO_Function[adressofstruct].AO_Line1;
+   \   00005D 9093         LDW       Y, X
+   \   00005F 905C         INCW      Y
+   \   000061 90F6         LD        A, (Y)
+   \   000063 6B 10        LD        (0x10,SP), A
+    883                   Reply_ALL_DataInFlash[16] = ABIO_Function[adressofstruct].BI_Line1;
+   \   000065 CD ....      CALL      L:?Subroutine30
+   \                     ??CrossCallReturnLabel_74:
+   \   000068 6B 11        LD        (0x11,SP), A
+    884                   Reply_ALL_DataInFlash[17] = ABIO_Function[adressofstruct].BO_Line1;
+   \   00006A CD ....      CALL      L:?Subroutine32
+   \                     ??CrossCallReturnLabel_76:
+   \   00006D 6B 12        LD        (0x12,SP), A
+    885                   Reply_ALL_DataInFlash[18] = ABIO_Function[adressofstruct].TOOGLE_Line1;
+   \   00006F 1C 0004      ADDW      X, #0x4
+   \   000072 F6           LD        A, (X)
+   \   000073 6B 13        LD        (0x13,SP), A
+    886                                  
+    887                  
+    888                   //开始发送
+    889                   timer2_delay(50);  
+   \   000075 AE 0032      LDW       X, #0x32
+   \   000078 CD ....      CALL      L:?Subroutine8
+    890                   halRfSendPacket( Reply_ALL_DataInFlash, 19 );          
+   \                     ??CrossCallReturnLabel_25:
+   \   00007B A6 13        LD        A, #0x13
+   \   00007D 96           LDW       X, SP
+   \   00007E 5C           INCW      X
+   \   00007F CD ....      CALL      L:halRfSendPacket
+    891              }
+    892          }
+   \                     ??Reply_RequestFlashData_0:
+   \   000082 5B 13        ADD       SP, #0x13
+   \   000084 81           RET
+
+   \                                 In section .near_func.text, align 1
+   \                     ?Subroutine32:
+   \   000000 9093         LDW       Y, X
+   \   000002 72A9 0003    ADDW      Y, #0x3
+   \   000006 90F6         LD        A, (Y)
+   \   000008 81           RET
+
+   \                                 In section .near_func.text, align 1
+   \                     ?Subroutine30:
+   \   000000 9093         LDW       Y, X
+   \   000002 72A9 0002    ADDW      Y, #0x2
+   \   000006 90F6         LD        A, (Y)
+   \   000008 81           RET
+
+   \                                 In section .near_func.text, align 1
+   \                     ?Subroutine23:
+   \   000000 BF ..        LDW       S:?w0, X
+   \   000002 BE ..        LDW       X, S:?w1
+   \   000004 CC ....      JP        L:?mul16_x_x_w0
+    893          
+    894          
+    895          /**
+    896          @function：报文 接收  处理函数  
+    897          **/
+
+   \                                 In section .near_func.text, align 1
+    898          void  Radio_Recive(void)
+    899          {   
+   \                     Radio_Recive:
+   \   000000 3B ....      PUSH      S:?b8
+    900              INT8U  clear_num = 0;
+   \   000003 3F ..        CLR       S:?b8
+    901              receiveflag = 0;                       //复位接收中断标志 
+   \   000005 725F ....    CLR       L:receiveflag
+    902              if(LearnModeWaitForConfirm == OFF)     // 若为ON 说明已经接收到了一个报文 ，学习模式
+   \   000009 C6 ....      LD        A, L:LearnModeWaitForConfirm
+   \   00000C A1 10        CP        A, #0x10
+   \   00000E 26 0D        JRNE      L:??Radio_Recive_0
+    903              {           
+    904                   receive_radio_length = halRfReceivePacket(Radio_Data,&max_radio_length);
+   \   000010 90AE ....    LDW       Y, #max_radio_length
+   \   000014 AE ....      LDW       X, #Radio_Data
+   \   000017 CD ....      CALL      L:halRfReceivePacket
+   \   00001A C7 ....      LD        L:receive_radio_length, A
+    905              }                    
+    906              /**  工作模式  **/
+    907              if( learn_mode == OFF )   
+   \                     ??Radio_Recive_0:
+   \   00001D C6 ....      LD        A, L:learn_mode
+   \   000020 A1 10        CP        A, #0x10
+   \   000022 26 45        JRNE      L:??Radio_Recive_1
+    908              {      
+    909                   switch(Radio_Data[0])
+   \   000024 C6 ....      LD        A, L:Radio_Data
+   \   000027 27 1B        JREQ      L:??Radio_Recive_2
+   \   000029 A0 02        SUB       A, #0x2
+   \   00002B 27 1C        JREQ      L:??Radio_Recive_3
+   \   00002D 4A           DEC       A
+   \   00002E 27 1E        JREQ      L:??Radio_Recive_4
+   \   000030 A0 04        SUB       A, #0x4
+   \   000032 27 06        JREQ      L:??Radio_Recive_5
+   \   000034 A0 02        SUB       A, #0x2
+   \   000036 27 07        JREQ      L:??Radio_Recive_6
+   \   000038 20 19        JRA       L:??Radio_Recive_7
+    910                  {          
+    911                      /*****  常规报文以及 远程控制报文  *****/
+    912                      case 0x07:
+    913                      {                        
+    914                          radio_7_function();
+   \                     ??Radio_Recive_5:
+   \   00003A CD ....      CALL      L:radio_7_function
+    915                          break;                                                                          
+   \   00003D 20 1A        JRA       L:??Radio_Recive_8
+    916                      }        
+    917                      
+    918                      /*****  报文类型为0x09  远程控制执行器报文 *****/
+    919                      case 0x09:
+    920                      {
+    921                          radio_9_function();      
+   \                     ??Radio_Recive_6:
+   \   00003F CD ....      CALL      L:radio_9_function
+    922                          break;
+   \   000042 20 15        JRA       L:??Radio_Recive_8
+    923                      }                        
+    924                      
+    925                      /*****  应答广播报文  *****/
+    926                      case 0x00:
+    927                      {
+    928                          radio_0_function();
+   \                     ??Radio_Recive_2:
+   \   000044 CD ....      CALL      L:radio_0_function
+    929                          break;
+   \   000047 20 10        JRA       L:??Radio_Recive_8
+    930                      }
+    931                      
+    932                      /*****  主机向从机发送传输数据的请求  *****/
+    933                      case 0x02:
+    934                      {
+    935                          radio_2_function();
+   \                     ??Radio_Recive_3:
+   \   000049 CD ....      CALL      L:radio_2_function
+    936                          break;
+   \   00004C 20 0B        JRA       L:??Radio_Recive_8
+    937                      }      
+    938                      
+    939                      /*****  报文长度为 20 则为远程学习报文  *****/ 
+    940                      case 0x03:
+    941                      {
+    942                          radio_3_function();
+   \                     ??Radio_Recive_4:
+   \   00004E CD ....      CALL      L:radio_3_function
+    943                          break;
+   \   000051 20 06        JRA       L:??Radio_Recive_8
+    944                      }  
+    945          
+    946                      default:{break;}                           
+    947                  }
+    948                  for(;clear_num < RECEIVE_DATA_LENGTH;clear_num ++) //操作完成，清空Radio_Data[]
+   \                     ??Radio_Recive_7:
+   \   000053 B6 ..        LD        A, S:?b8
+   \   000055 A1 21        CP        A, #0x21
+   \   000057 24 29        JRNC      L:??CrossCallReturnLabel_48
+    949                  {
+    950                      Radio_Data[clear_num]=0;
+   \                     ??Radio_Recive_8:
+   \   000059 5F           CLRW      X
+   \   00005A 41           EXG       A, XL
+   \   00005B B6 ..        LD        A, S:?b8
+   \   00005D 41           EXG       A, XL
+   \   00005E 4F           CLR       A
+   \   00005F D7 ....      LD        (L:Radio_Data,X), A
+    951                  }
+   \   000062 B6 ..        LD        A, S:?b8
+   \   000064 4C           INC       A
+   \   000065 B7 ..        LD        S:?b8, A
+   \   000067 20 EA        JRA       L:??Radio_Recive_7
+    952                  clear_num = 0;
+    953              }
+    954              /**  学习模式 **/
+    955              else if(learn_mode == ON)      
+   \                     ??Radio_Recive_1:
+   \   000069 A1 11        CP        A, #0x11
+   \   00006B 26 15        JRNE      L:??CrossCallReturnLabel_48
+    956              {
+    957                  if((Radio_Data[0] == 7) && (Radio_Data[5] < 2))    
+   \   00006D C6 ....      LD        A, L:Radio_Data
+   \   000070 A1 07        CP        A, #0x7
+   \   000072 26 0E        JRNE      L:??CrossCallReturnLabel_48
+   \   000074 C6 ....      LD        A, L:Radio_Data + 5
+   \   000077 A1 02        CP        A, #0x2
+   \   000079 24 07        JRNC      L:??CrossCallReturnLabel_48
+    958                  {         
+    959                      LearnModeWaitForConfirm = ON;          //进入 等待确认 
+   \   00007B 35 11 ....   MOV       L:LearnModeWaitForConfirm, #0x11
+    960                      WaitForConfirm_time     = 0;           //自动退出学习确认等待时间 清零   
+   \   00007F CD ....      CALL      L:?Subroutine20
+    961                  }                     
+    962              } 
+    963          }
+   \                     ??CrossCallReturnLabel_48:
+   \   000082 32 ....      POP       S:?b8
+   \   000085 81           RET
+    964          
+    965          
+    966          /**
+    967          @function： 报文接收正确后  正常工作模式   执行对继电器的操作 
+    968          @parameter：Key_num 接收到的报文对应的键值
+    969          @parameter：AdressOfData 接收的报文在Flash中条目的编号
+    970          **/
+
+   \                                 In section .near_func.text, align 1
+    971          INT8U CommonMode_OperateLine(INT8U Key_num,INT8U AdressOfData)
+    972          {
+    973               INT8U flash_line_num = 0;
+    974               if((Key_num == AI) && (ABIO_Function[AdressOfData].AI_Line1 == AI))
+   \                     CommonMode_OperateLine:
+   \   000000 905F         CLRW      Y
+   \   000002 61           EXG       A, YL
+   \   000003 B6 ..        LD        A, S:?b0
+   \   000005 61           EXG       A, YL
+   \   000006 CD ....      CALL      L:?Subroutine46
+   \                     ??CrossCallReturnLabel_105:
+   \   000009 A1 10        CP        A, #0x10
+   \   00000B 26 05        JRNE      L:??CommonMode_OperateLine_0
+   \   00000D F6           LD        A, (X)
+   \   00000E A1 10        CP        A, #0x10
+   \   000010 20 16        JRA       L:??CommonMode_OperateLine_1
+    975               {
+    976                  CLOSE_LINE1;         
+    977                  flash_line_num = 1; 
+    978               }
+    979               if((Key_num == AO) && (ABIO_Function[AdressOfData].AO_Line1 == AO))
+   \                     ??CommonMode_OperateLine_0:
+   \   000012 A1 30        CP        A, #0x30
+   \   000014 26 08        JRNE      L:??CommonMode_OperateLine_2
+   \   000016 5C           INCW      X
+   \   000017 F6           LD        A, (X)
+   \   000018 A1 30        CP        A, #0x30
+   \   00001A 26 2E        JRNE      L:??CommonMode_OperateLine_3
+   \   00001C 20 20        JRA       L:??CommonMode_OperateLine_4
+    980               { 
+    981                 OPEN_LINE1;   
+    982                 flash_line_num = 1;  
+    983               }       
+    984               if((Key_num == BO) && (ABIO_Function[AdressOfData].BI_Line1 == BI))
+   \                     ??CommonMode_OperateLine_2:
+   \   00001E A1 70        CP        A, #0x70
+   \   000020 26 10        JRNE      L:??CommonMode_OperateLine_5
+   \   000022 1C 0002      ADDW      X, #0x2
+   \   000025 F6           LD        A, (X)
+   \   000026 A1 50        CP        A, #0x50
+   \                     ??CommonMode_OperateLine_1:
+   \   000028 26 20        JRNE      L:??CommonMode_OperateLine_3
+    985               { 
+    986                 CLOSE_LINE1;  
+   \   00002A CD ....      CALL      L:?Subroutine29
+   \                     ??CrossCallReturnLabel_69:
+   \   00002D CD ....      CALL      L:GPIO_ResetBits
+    987                 flash_line_num = 1; 
+   \   000030 20 0F        JRA       L:??CrossCallReturnLabel_19
+    988               }
+    989               if((Key_num == BI) && (ABIO_Function[AdressOfData].BO_Line1 == BO))
+   \                     ??CommonMode_OperateLine_5:
+   \   000032 A1 50        CP        A, #0x50
+   \   000034 26 14        JRNE      L:??CommonMode_OperateLine_3
+   \   000036 1C 0003      ADDW      X, #0x3
+   \   000039 F6           LD        A, (X)
+   \   00003A A1 70        CP        A, #0x70
+   \   00003C 26 0C        JRNE      L:??CommonMode_OperateLine_3
+    990               { 
+    991                 OPEN_LINE1;   
+   \                     ??CommonMode_OperateLine_4:
+   \   00003E CD ....      CALL      L:?Subroutine6
+    992                 flash_line_num = 1; 
+    993               }  
+    994               if((Key_num == ABIO_TOOGLE) && (ABIO_Function[AdressOfData].TOOGLE_Line1 == ABIO_TOOGLE))
+    995               { 
+    996                 //TOOGLE_LINE1; 
+    997                //GPIO_ToggleBits(LED1_RED_PORT,LED1_RED_PIN);       
+    998               }         
+    999              
+   1000               if(flash_line_num == 1)
+   1001               {
+   1002                  LED1_GREEN;
+   \                     ??CrossCallReturnLabel_19:
+   \   000041 CD ....      CALL      L:?Subroutine2
+   \                     ??CrossCallReturnLabel_5:
+   \   000044 CD ....      CALL      L:delay
+   1003                  delay(100);
+   1004                  Led1_Off(); 
+   \   000047 CD ....      CALL      L:Led1_Off
+   1005               }
+   1006               return 0;
+   \                     ??CommonMode_OperateLine_3:
+   \   00004A 4F           CLR       A
+   \   00004B 81           RET
+   1007          }
+   1008          
+   1009          /**
+   1010          @function：报文类型为 7 时执行函数
+   1011          **/
+
+   \                                 In section .near_func.text, align 1
+   1012          void radio_7_function(void)
+   1013          { 
+   1014              /***** 常规操作：Radio-type要求为0x7（开关） 被转发次数要求不超过2次 *****/
+   1015              if((Radio_Data[0] == 0x07) && (Radio_Data[5] < 2))    
+   \                     radio_7_function:
+   \   000000 C6 ....      LD        A, L:Radio_Data
+   \   000003 A1 07        CP        A, #0x7
+   \   000005 26 37        JRNE      L:??radio_7_function_0
+   \   000007 C6 ....      LD        A, L:Radio_Data + 5
+   \   00000A A1 02        CP        A, #0x2
+   \   00000C 24 30        JRNC      L:??radio_7_function_0
+   1016              {                                                                                                                                             
+   1017                  Return_FindInFlash = FindIdInFlash(Radio_Data[1],Radio_Data[2],Radio_Data[3],Radio_Data[4]);                     
+   \   00000E C6 ....      LD        A, L:Radio_Data + 4
+   \   000011 B7 ..        LD        S:?b2, A
+   \   000013 C6 ....      LD        A, L:Radio_Data + 3
+   \   000016 B7 ..        LD        S:?b1, A
+   \   000018 C6 ....      LD        A, L:Radio_Data + 2
+   \   00001B B7 ..        LD        S:?b0, A
+   \   00001D C6 ....      LD        A, L:Radio_Data + 1
+   \   000020 CD ....      CALL      L:FindIdInFlash
+   \   000023 C7 ....      LD        L:Return_FindInFlash, A
+   1018                  if(Return_FindInFlash != FINDINFLASH_FAIL )   //在flash中查找到有此ID
+   \   000026 A1 77        CP        A, #0x77
+   \   000028 27 14        JREQ      L:??radio_7_function_0
+   1019                  { 
+   1020                       if(Radio_Can_Operated)   
+   \   00002A C6 ....      LD        A, L:Radio_Can_Operated
+   \   00002D 27 0F        JREQ      L:??radio_7_function_0
+   1021                       {
+   1022                            CommonMode_OperateLine(Radio_Data[6],Return_FindInFlash);                      
+   \   00002F C6 ....      LD        A, L:Return_FindInFlash
+   \   000032 B7 ..        LD        S:?b0, A
+   \   000034 C6 ....      LD        A, L:Radio_Data + 6
+   \   000037 CD ....      CALL      L:CommonMode_OperateLine
+   1023                            Radio_Can_Operated = 0;       //转为不可操作 
+   \   00003A 725F ....    CLR       L:Radio_Can_Operated
+   1024                       }                                                                         
+   1025                  }
+   1026              }
+   1027          }
+   \                     ??radio_7_function_0:
+   \   00003E 81           RET
+   1028          
+   1029          /**
+   1030          @function：报文类型为 9 时执行函数
+   1031                     远程控制执行器报文
+   1032          包含应答报文的发送
+   1033          **/
+
+   \                                 In section .near_func.text, align 1
+   1034          INT8U radio_9_function(void)
+   1035          { 
+   \                     radio_9_function:
+   \   000000 52 17        SUB       SP, #0x17
+   1036              INT8U replay_data[23]={0}; 
+   \   000002 90AE ....    LDW       Y, #?_2
+   \   000006 96           LDW       X, SP
+   \   000007 5C           INCW      X
+   \   000008 89           PUSHW     X
+   \   000009 A6 17        LD        A, #0x17
+   \   00000B CD ....      CALL      L:?move1616_v_x_y_a
+   \   00000E 85           POPW      X
+   1037              INT8U line_state = 0x0;
+   1038              
+   1039              if((Radio_Data[2]==LINE1_SN_1) && (Radio_Data[3]==LINE1_SN_2) && (Radio_Data[4]==LINE1_SN_3) && (Radio_Data[5]==LINE1_SN_4) && (Radio_Data[6]==LINE1_SN_5) && (Radio_Data[7]==LINE1_SN_6) )
+   \   00000F C6 ....      LD        A, L:Radio_Data + 2
+   \   000012 26 61        JRNE      L:??radio_9_function_0
+   \   000014 C6 ....      LD        A, L:Radio_Data + 3
+   \   000017 26 5C        JRNE      L:??radio_9_function_0
+   \   000019 C6 ....      LD        A, L:Radio_Data + 4
+   \   00001C 26 57        JRNE      L:??radio_9_function_0
+   \   00001E C6 ....      LD        A, L:Radio_Data + 5
+   \   000021 26 52        JRNE      L:??radio_9_function_0
+   \   000023 C6 ....      LD        A, L:Radio_Data + 6
+   \   000026 26 4D        JRNE      L:??radio_9_function_0
+   \   000028 C6 ....      LD        A, L:Radio_Data + 7
+   \   00002B A1 01        CP        A, #0x1
+   \   00002D 26 46        JRNE      L:??radio_9_function_0
+   1040              {
+   1041                
+   1042                 if((Radio_Data[20] == 0x00)  &&  (Radio_Data[1] == 0x02))        //关闭Line1
+   \   00002F C6 ....      LD        A, L:Radio_Data + 20
+   \   000032 26 0C        JRNE      L:??radio_9_function_1
+   \   000034 C6 ....      LD        A, L:Radio_Data + 1
+   \   000037 A1 02        CP        A, #0x2
+   \   000039 26 1A        JRNE      L:??radio_9_function_2
+   1043                 {
+   1044                   CLOSE_LINE1;  
+   \   00003B CD ....      CALL      L:?Subroutine24
+   1045                   Led1_Off();
+   1046                   replay_data[20] = 1;
+   \                     ??CrossCallReturnLabel_56:
+   \   00003E 20 11        JRA       L:??CrossCallReturnLabel_8
+   1047                 }
+   1048                 else if((Radio_Data[20] == 0xFF)  &&  (Radio_Data[1] == 0x02))  //打开Line1
+   \                     ??radio_9_function_1:
+   \   000040 A1 FF        CP        A, #0xff
+   \   000042 26 11        JRNE      L:??radio_9_function_2
+   \   000044 C6 ....      LD        A, L:Radio_Data + 1
+   \   000047 A1 02        CP        A, #0x2
+   \   000049 26 0A        JRNE      L:??radio_9_function_2
+   1049                 { 
+   1050                   OPEN_LINE1;  
+   \   00004B CD ....      CALL      L:?Subroutine6
+   1051                   LED1_GREEN;  
+   \                     ??CrossCallReturnLabel_20:
+   \   00004E CD ....      CALL      L:?Subroutine3
+   1052                   replay_data[20] = 1;
+   \                     ??CrossCallReturnLabel_8:
+   \   000051 A6 01        LD        A, #0x1
+   \   000053 6B 15        LD        (0x15,SP), A
+   1053                 } 
+   1054                 line_state = GPIO_ReadInputDataBit(LINE1_PORT,LINE1_PIN);
+   1055                 if( line_state )
+   \                     ??radio_9_function_2:
+   \   000055 CD ....      CALL      L:?Subroutine29
+   \                     ??CrossCallReturnLabel_68:
+   \   000058 CD ....      CALL      L:GPIO_ReadInputDataBit
+   \   00005B A1 00        CP        A, #0x0
+   \   00005D 27 04        JREQ      L:??radio_9_function_3
+   1056                 { replay_data[19] = 0xFF; }
+   \   00005F A6 FF        LD        A, #0xff
+   \   000061 20 01        JRA       L:??radio_9_function_4
+   1057                 else if( !line_state )
+   1058                 { replay_data[19] = 0x00; }   
+   \                     ??radio_9_function_3:
+   \   000063 4F           CLR       A
+   \                     ??radio_9_function_4:
+   \   000064 6B 14        LD        (0x14,SP), A
+   1059                      
+   1060                 //子设备SN
+   1061                 replay_data[1]=LINE1_SN_1;replay_data[2]=LINE1_SN_2;replay_data[3]=LINE1_SN_3;replay_data[4]=LINE1_SN_4;replay_data[5]=LINE1_SN_5;replay_data[6]=LINE1_SN_6;
+   \   000066 4F           CLR       A
+   \   000067 6B 02        LD        (0x2,SP), A
+   \   000069 6B 03        LD        (0x3,SP), A
+   \   00006B 6B 04        LD        (0x4,SP), A
+   \   00006D 6B 05        LD        (0x5,SP), A
+   \   00006F 6B 06        LD        (0x6,SP), A
+   \   000071 A6 01        LD        A, #0x1
+   \   000073 6B 07        LD        (0x7,SP), A
+   1062                 
+   1063              }  
+   1064              else
+   1065              { }//没有这个SN 
+   1066                
+   1067               /*  将操作结果回复给主机 */
+   1068               replay_data[0]=0x10;   //报文头
+   \                     ??radio_9_function_0:
+   \   000075 A6 10        LD        A, #0x10
+   \   000077 6B 01        LD        (0x1,SP), A
+   1069               
+   1070               for(int i=7;i<19;i++)
+   \   000079 AE 0007      LDW       X, #0x7
+   1071               {  replay_data[i] = Radio_Data[i+1]; }
+   \                     ??radio_9_function_5:
+   \   00007C 9093         LDW       Y, X
+   \   00007E 72A9 ....    ADDW      Y, #Radio_Data + 1
+   \   000082 90F6         LD        A, (Y)
+   \   000084 9096         LDW       Y, SP
+   \   000086 905C         INCW      Y
+   \   000088 BF ..        LDW       S:?w0, X
+   \   00008A 72B9 ....    ADDW      Y, S:?w0
+   \   00008E 90F7         LD        (Y), A
+   \   000090 5C           INCW      X
+   \   000091 A3 0013      CPW       X, #0x13
+   \   000094 2F E6        JRSLT     L:??radio_9_function_5
+   1072               
+   1073               timer2_delay(15);                //延时，考虑到请求端需要一定时间进入接收状态
+   \   000096 AE 000F      LDW       X, #0xf
+   \   000099 CD ....      CALL      L:?Subroutine8
+   1074               halRfSendPacket( replay_data, 21 );
+   \                     ??CrossCallReturnLabel_26:
+   \   00009C A6 15        LD        A, #0x15
+   \   00009E 96           LDW       X, SP
+   \   00009F 5C           INCW      X
+   \   0000A0 CD ....      CALL      L:halRfSendPacket
+   1075          
+   1076               return 0;
+   \   0000A3 4F           CLR       A
+   \   0000A4 5B 17        ADD       SP, #0x17
+   \   0000A6 81           RET
+   1077          }
+   1078          
+   1079          
+   1080          /**
+   1081          @function：报文类型为  0x02 时执行函数
+   1082                    主机向从机发送传输数据的请求 
+   1083          **/
+
+   \                                 In section .near_func.text, align 1
+   1084          void radio_2_function(void)
+   1085          {
+   1086              //请求回复设备中存储的信息： 0x2报文类型)  0x？:0x？:0x？:0x？(从设备ID)   0x？  （从机数据区地址）
+   1087              if( (Radio_Data[0]==0x2) &&  (Radio_Data[1] == DEVICE_ID_1 ) &&  (Radio_Data[2] == DEVICE_ID_2 ) &&  (Radio_Data[3] == DEVICE_ID_3 ) &&  (Radio_Data[4] == DEVICE_ID_4 ) ) 
+   \                     radio_2_function:
+   \   000000 C6 ....      LD        A, L:Radio_Data
+   \   000003 A1 02        CP        A, #0x2
+   \   000005 26 36        JRNE      L:??radio_2_function_0
+   \   000007 C6 ....      LD        A, L:Radio_Data + 1
+   \   00000A A1 30        CP        A, #0x30
+   \   00000C 26 2F        JRNE      L:??radio_2_function_0
+   \   00000E C6 ....      LD        A, L:Radio_Data + 2
+   \   000011 A1 30        CP        A, #0x30
+   \   000013 26 28        JRNE      L:??radio_2_function_0
+   \   000015 C6 ....      LD        A, L:Radio_Data + 3
+   \   000018 A1 30        CP        A, #0x30
+   \   00001A 26 21        JRNE      L:??radio_2_function_0
+   \   00001C C6 ....      LD        A, L:Radio_Data + 4
+   \   00001F A1 30        CP        A, #0x30
+   \   000021 26 1A        JRNE      L:??radio_2_function_0
+   1088              {         
+   1089                  Reply_RequestFlashData(Radio_Data[9],Radio_Data[5],Radio_Data[6],Radio_Data[7],Radio_Data[8]);                                                             
+   \   000023 C6 ....      LD        A, L:Radio_Data + 8
+   \   000026 B7 ..        LD        S:?b3, A
+   \   000028 C6 ....      LD        A, L:Radio_Data + 7
+   \   00002B B7 ..        LD        S:?b2, A
+   \   00002D C6 ....      LD        A, L:Radio_Data + 6
+   \   000030 B7 ..        LD        S:?b1, A
+   \   000032 C6 ....      LD        A, L:Radio_Data + 5
+   \   000035 B7 ..        LD        S:?b0, A
+   \   000037 C6 ....      LD        A, L:Radio_Data + 9
+   \   00003A CD ....      CALL      L:Reply_RequestFlashData
+   1090              }   
+   1091          }
+   \                     ??radio_2_function_0:
+   \   00003D 81           RET
+   1092          
+   1093          
+   1094          /**
+   1095          @function：报文类型为 0x00  时执行函数
+   1096                    主机发送的广播请求 
+   1097          **/
+
+   \                                 In section .near_func.text, align 1
+   1098          void radio_0_function(void)
+   1099          {
+   \                     radio_0_function:
+   \   000000 52 0A        SUB       SP, #0xa
+   1100              INT8U  Reply_BroadcastData[10] = {0x00 ,Radio_Data[1],Radio_Data[2],Radio_Data[3],Radio_Data[4],DEVICE_ID_1,DEVICE_ID_2,DEVICE_ID_3,DEVICE_ID_4,DEVICE_TYPE};
+   \   000002 90AE ....    LDW       Y, #?_3
+   \   000006 96           LDW       X, SP
+   \   000007 5C           INCW      X
+   \   000008 89           PUSHW     X
+   \   000009 A6 0A        LD        A, #0xa
+   \   00000B CD ....      CALL      L:?move1616_v_x_y_a
+   \   00000E 85           POPW      X
+   \   00000F C6 ....      LD        A, L:Radio_Data + 1
+   \   000012 B7 ..        LD        S:?b0, A
+   \   000014 6B 02        LD        (0x2,SP), A
+   \   000016 C6 ....      LD        A, L:Radio_Data + 2
+   \   000019 B7 ..        LD        S:?b1, A
+   \   00001B 6B 03        LD        (0x3,SP), A
+   \   00001D C6 ....      LD        A, L:Radio_Data + 3
+   \   000020 B7 ..        LD        S:?b2, A
+   \   000022 6B 04        LD        (0x4,SP), A
+   \   000024 C6 ....      LD        A, L:Radio_Data + 4
+   \   000027 B7 ..        LD        S:?b3, A
+   \   000029 6B 05        LD        (0x5,SP), A
+   1101              
+   1102              if( (Radio_Data[0]==0x00) &&  (Radio_Data[1] == DEVICE_ID_1 ) &&  (Radio_Data[2] == DEVICE_ID_2 ) &&  (Radio_Data[3] == DEVICE_ID_3 ) &&  (Radio_Data[4] == DEVICE_ID_4 ) ) 
+   \   00002B C6 ....      LD        A, L:Radio_Data
+   \   00002E 26 2B        JRNE      L:??CrossCallReturnLabel_27
+   \   000030 B6 ..        LD        A, S:?b0
+   \   000032 A1 30        CP        A, #0x30
+   \   000034 26 25        JRNE      L:??CrossCallReturnLabel_27
+   \   000036 B6 ..        LD        A, S:?b1
+   \   000038 A1 30        CP        A, #0x30
+   \   00003A 26 1F        JRNE      L:??CrossCallReturnLabel_27
+   \   00003C B6 ..        LD        A, S:?b2
+   \   00003E A1 30        CP        A, #0x30
+   \   000040 26 19        JRNE      L:??CrossCallReturnLabel_27
+   \   000042 B6 ..        LD        A, S:?b3
+   \   000044 A1 30        CP        A, #0x30
+   \   000046 26 13        JRNE      L:??CrossCallReturnLabel_27
+   1103              {                  
+   1104                 timer2_delay(DEVICE_ID_4*10);  //随机延时      
+   \   000048 AE 01E0      LDW       X, #0x1e0
+   \   00004B CD ....      CALL      L:?Subroutine8
+   1105                 halRfSendPacket( Reply_BroadcastData, 10 );
+   \                     ??CrossCallReturnLabel_28:
+   \   00004E A6 0A        LD        A, #0xa
+   \   000050 96           LDW       X, SP
+   \   000051 5C           INCW      X
+   \   000052 CD ....      CALL      L:halRfSendPacket
+   1106                 timer2_delay(5);                
+   \   000055 AE 0005      LDW       X, #0x5
+   \   000058 CD ....      CALL      L:?Subroutine8
+   1107              }   
+   1108          }
+   \                     ??CrossCallReturnLabel_27:
+   \   00005B 5B 0A        ADD       SP, #0xa
+   \   00005D 81           RET
+
+   \                                 In section .near.rodata, align 1
+   \                     ?_3:
+   \   000000 00 00 00 00  DC8 0, 0, 0, 0, 0, 48, 48, 48, 48, 2
+   \          00 30 30 30 
+   1109          
+   1110          
+   1111          /**
+   1112          @function：报文类型为  0x3 时 远程学习报文
+   1113                                   
+   1114          **/
+
+   \                                 In section .near_func.text, align 1
+   1115          void radio_3_function(void)
+   1116          {
+   1117              /*03(远程学习报文头)    （目标设备ID）  （操作类型：写入 & 删除）      (操作数据)*/   
+   1118              if((Radio_Data[0]==0x3)&&(DEVICE_ID_1==Radio_Data[4])&&(DEVICE_ID_2==Radio_Data[3])&&(DEVICE_ID_3==Radio_Data[2])&&(DEVICE_ID_4==Radio_Data[1]))  //确认目标设备为自身
+   \                     radio_3_function:
+   \   000000 C6 ....      LD        A, L:Radio_Data
+   \   000003 A1 03        CP        A, #0x3
+   \   000005 26 7C        JRNE      L:??radio_3_function_0
+   \   000007 C6 ....      LD        A, L:Radio_Data + 4
+   \   00000A A1 30        CP        A, #0x30
+   \   00000C 26 75        JRNE      L:??radio_3_function_0
+   \   00000E C6 ....      LD        A, L:Radio_Data + 3
+   \   000011 A1 30        CP        A, #0x30
+   \   000013 26 6E        JRNE      L:??radio_3_function_0
+   \   000015 C6 ....      LD        A, L:Radio_Data + 2
+   \   000018 A1 30        CP        A, #0x30
+   \   00001A 26 67        JRNE      L:??radio_3_function_0
+   \   00001C C6 ....      LD        A, L:Radio_Data + 1
+   \   00001F A1 30        CP        A, #0x30
+   \   000021 26 60        JRNE      L:??radio_3_function_0
+   1119              {
+   1120                  if(Radio_Data[5] == 0x1)  //远程学习 操作类型：写入命令
+   \   000023 C6 ....      LD        A, L:Radio_Data + 5
+   \   000026 A1 01        CP        A, #0x1
+   \   000028 26 33        JRNE      L:??radio_3_function_1
+   1121                  {
+   1122                      Return_FindInFlash = FindIdInFlash(Radio_Data[6],Radio_Data[7],Radio_Data[8],Radio_Data[9]);
+   \   00002A CD ....      CALL      L:?Subroutine28
+   1123                      //写数据
+   1124                      ControlByAirLearn_NewWriteInFlash(Radio_Data[10],Radio_Data[11],Radio_Data[12],Radio_Data[13],Radio_Data[14], LINE_1 ,Public_learned_ID_num);
+   \                     ??CrossCallReturnLabel_66:
+   \   00002D C6 ....      LD        A, L:Public_learned_ID_num
+   \   000030 B7 ..        LD        S:?b5, A
+   \   000032 35 16 ....   MOV       S:?b4, #0x16
+   \   000036 C6 ....      LD        A, L:Radio_Data + 14
+   \   000039 B7 ..        LD        S:?b3, A
+   \   00003B C6 ....      LD        A, L:Radio_Data + 13
+   \   00003E B7 ..        LD        S:?b2, A
+   \   000040 C6 ....      LD        A, L:Radio_Data + 12
+   \   000043 B7 ..        LD        S:?b1, A
+   \   000045 C6 ....      LD        A, L:Radio_Data + 11
+   \   000048 B7 ..        LD        S:?b0, A
+   \   00004A C6 ....      LD        A, L:Radio_Data + 10
+   \   00004D CD ....      CALL      L:ControlByAirLearn_NewWriteInFlash
+   1125                                   
+   1126                      if(Return_FindInFlash == FINDINFLASH_FAIL)                 //在Flash中没有找到此ID  ==FINDINFLASH_FAIL
+   \   000050 C6 ....      LD        A, L:Return_FindInFlash
+   \   000053 A1 77        CP        A, #0x77
+   \   000055 26 06        JRNE      L:??radio_3_function_1
+   1127                      {
+   1128                         WriteIdInFlash(Radio_Data[6],Radio_Data[7],Radio_Data[8],Radio_Data[9]);       //将ID写入Flash                            
+   \   000057 CD ....      CALL      L:?Subroutine44
+   1129                      }
+   1130                      else   //Flash中已经存在该ID
+   1131                      {}           
+   1132                      //TODO 操作成功，则进行应答
+   1133                  }                       
+   \                     ??CrossCallReturnLabel_101:
+   \   00005A CD ....      CALL      L:WriteIdInFlash
+   1134                  if(Radio_Data[5] == 0x2)  //远程学习 操作类型：删除该条目录
+   \                     ??radio_3_function_1:
+   \   00005D C6 ....      LD        A, L:Radio_Data + 5
+   \   000060 A1 02        CP        A, #0x2
+   \   000062 26 1F        JRNE      L:??radio_3_function_0
+   1135                  {
+   1136                      Return_FindInFlash = FindIdInFlash(Radio_Data[6],Radio_Data[7],Radio_Data[8],Radio_Data[9]);
+   \   000064 CD ....      CALL      L:?Subroutine28
+   1137                      if(Return_FindInFlash == FINDINFLASH_FAIL)         //在Flash中没有找到此ID  ==FINDINFLASH_FAIL
+   \                     ??CrossCallReturnLabel_67:
+   \   000067 A1 77        CP        A, #0x77
+   \   000069 27 18        JREQ      L:??radio_3_function_0
+   1138                      {
+   1139                      //TODO 不存在该条目                         
+   1140                      }
+   1141                      else if(Return_FindInFlash != FINDINFLASH_FAIL)
+   1142                      {
+   1143                          ControlByAirLearn_NewWriteInFlash(0x00,0x00,0x00,0x00,0x00, LINE_1, Return_FindInFlash );  //对数据区域写 0x00                             
+   \   00006B B7 ..        LD        S:?b5, A
+   \   00006D 35 16 ....   MOV       S:?b4, #0x16
+   \   000071 3F ..        CLR       S:?b3
+   \   000073 3F ..        CLR       S:?b2
+   \   000075 3F ..        CLR       S:?b1
+   \   000077 3F ..        CLR       S:?b0
+   \   000079 4F           CLR       A
+   \   00007A CD ....      CALL      L:ControlByAirLearn_NewWriteInFlash
+   1144                          //更新Flash中所有条目的排位 
+   1145                          UpdateDatasAdressInFlash(Return_FindInFlash);                               
+   \   00007D C6 ....      LD        A, L:Return_FindInFlash
+   \   000080 CD ....      CALL      L:UpdateDatasAdressInFlash
+   1146                      }
+   1147                  }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+   1148              }
+   1149          }
+   \                     ??radio_3_function_0:
+   \   000083 81           RET
+
+   \                                 In section .near_func.text, align 1
+   \                     ?Subroutine28:
+   \   000000 CD ....      CALL      L:?Subroutine44
+   \                     ??CrossCallReturnLabel_102:
+   \   000003 CD ....      CALL      L:FindIdInFlash
+   \   000006 C7 ....      LD        L:Return_FindInFlash, A
+   \   000009 81           RET
+
+   \                                 In section .near_func.text, align 1
+   \                     ?Subroutine44:
+   \   000000 C6 ....      LD        A, L:Radio_Data + 9
+   \   000003 B7 ..        LD        S:?b2, A
+   \   000005 C6 ....      LD        A, L:Radio_Data + 8
+   \   000008 B7 ..        LD        S:?b1, A
+   \   00000A C6 ....      LD        A, L:Radio_Data + 7
+   \   00000D B7 ..        LD        S:?b0, A
+   \   00000F C6 ....      LD        A, L:Radio_Data + 6
+   \   000012 81           RET
+   1150          
+   1151          
+   1152          
+   1153          
+   1154          /************  主函数入口  ******************/
+
+   \                                 In section .near_func.text, align 1
+   1155          void main(void)   
+   1156          {    
+   1157              InitAllGpio();                           //初始化IO口          
+   \                     main:
+   \   000000 CD ....      CALL      L:InitAllGpio
+   1158              InitRegister();                          //配置寄存器
+   \   000003 CD ....      CALL      L:InitRegister
+   1159              
+   1160              Reset_CC1100();                          //复位cc1101          
+   \   000006 CD ....      CALL      L:Reset_CC1100
+   1161              RadioSettings();                         //配置cc1101寄存器 
+   \   000009 CD ....      CALL      L:RadioSettings
+   1162          
+   1163              enableInterrupts();                      //使能中断
+   \   00000C 9A           RIM
+   1164            
+   1165              FirstPower();                            //判断是否是第一次开机   
+   \   00000D CD ....      CALL      L:FirstPower
+   1166              ReadIdInFlash();                         //读Flash中ID   
+   \   000010 CD ....      CALL      L:ReadIdInFlash
+   1167              
+   1168              LED1_BLUE;                     //开机LED提示
+   \   000013 CD ....      CALL      L:?Subroutine3
+   1169              delay(3000);  
+   \                     ??CrossCallReturnLabel_7:
+   \   000016 AE 0BB8      LDW       X, #0xbb8
+   \   000019 CD ....      CALL      L:?Subroutine12
+   1170              Led1_Off();
+   \                     ??CrossCallReturnLabel_37:
+   \   00001C CD ....      CALL      L:Led1_Off
+   1171                   
+   1172              IWDG_Enable();      
+   \   00001F CD ....      CALL      L:IWDG_Enable
+   \   000022 20 1D        JRA       L:??main_0
+   1173          
+   1174              while(1)
+   1175              {    
+   1176                  IWDG->KR = (0xAA);    //喂狗
+   1177                  if((clear_pll_clock == 1) && (receiveflag == 0) && (learn_mode == OFF))    
+   1178                  {  
+   1179                    clear_pll_clock = 0;
+   1180                    halSpiStrobe(0x36);halSpiStrobe(0x34);timer2_delay(1);       //矫正时钟
+   1181                    receiveflag = 0;
+   1182                  }
+   1183                
+   1184                  if(receiveflag )        //报文接收处理函数                 
+   \                     ??main_1:
+   \   000024 C6 ....      LD        A, L:receiveflag
+   \   000027 27 03        JREQ      L:??main_2
+   1185                  { 
+   1186                    Radio_Recive();
+   \   000029 CD ....      CALL      L:Radio_Recive
+   1187                  }
+   1188                  
+   1189                  if(check_key1 == 1)     //按键1扫描
+   \                     ??main_2:
+   \   00002C C6 ....      LD        A, L:check_key1
+   \   00002F A1 01        CP        A, #0x1
+   \   000031 26 03        JRNE      L:??main_3
+   1190                  {         
+   1191                    Key1_Function();
+   \   000033 CD ....      CALL      L:Key1_Function
+   1192                  }
+   1193                                        
+   1194                  if(learn_mode == ON)    //学习模式处理
+   \                     ??main_3:
+   \   000036 CD ....      CALL      L:?Subroutine27
+   \                     ??CrossCallReturnLabel_62:
+   \   000039 26 06        JRNE      L:??main_0
+   1195                  {                                                
+   1196                    Auto_Exit_LearnMode_Function();      
+   \   00003B CD ....      CALL      L:Auto_Exit_LearnMode_Function
+   1197                    LearnMode_Function();            
+   \   00003E CD ....      CALL      L:LearnMode_Function
+   1198                  }  
+   \                     ??main_0:
+   \   000041 35 AA 50E0   MOV       L:0x50e0, #0xaa
+   \   000045 C6 ....      LD        A, L:clear_pll_clock
+   \   000048 A1 01        CP        A, #0x1
+   \   00004A 26 D8        JRNE      L:??main_1
+   \   00004C C6 ....      LD        A, L:receiveflag
+   \   00004F 26 D3        JRNE      L:??main_1
+   \   000051 C6 ....      LD        A, L:learn_mode
+   \   000054 A1 10        CP        A, #0x10
+   \   000056 26 D4        JRNE      L:??main_2
+   \   000058 725F ....    CLR       L:clear_pll_clock
+   \   00005C CD ....      CALL      L:?Subroutine26
+   \                     ??CrossCallReturnLabel_61:
+   \   00005F CD ....      CALL      L:??Subroutine64_0
+   \                     ??CrossCallReturnLabel_142:
+   \   000062 725F ....    CLR       L:receiveflag
+   \   000066 20 C4        JRA       L:??main_2
+   1199          
+   1200              } 
+   1201          }
+
+   \                                 In section .near.rodata, align 1
+   \                     ?_0:
+   \   000000 01 30 30 30  DC8 1, 48, 48, 48, 48, 2
+   \          30 02       
+
+   \                                 In section .near.rodata, align 1
+   \                     ?_1:
+   \   000000 06 00 00 00  DC8 6, 0, 0, 0, 0, 0, 48, 48, 48, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \          00 00 30 30 
+
+   \                                 In section .near.rodata, align 1
+   \                     ?_2:
+   \   000000 00 00 00 00  DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \          00 00 00 00 
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       7  ??Subroutine61_0
+       7  ??Subroutine62_0
+       8  ??Subroutine63_0
+       3  ??Subroutine64_0
+       6  ??Subroutine65_0
+       6  ??Subroutine66_0
+       6  ??Subroutine67_0
+       9  ??Subroutine68_0
+       3  ??Subroutine69_0
+       4  ??Subroutine70_0
+       6  ??Subroutine71_0
+       4  ??Subroutine72_0
+       9  ??Subroutine73_0
+      13  ?Subroutine0
+       8  ?Subroutine1
+       4  ?Subroutine10
+       6  ?Subroutine11
+       6  ?Subroutine12
+       5  ?Subroutine13
+       3  ?Subroutine14
+       4  ?Subroutine15
+      18  ?Subroutine16
+       5  ?Subroutine17
+      41  ?Subroutine18
+      19  ?Subroutine19
+      10  ?Subroutine2
+       8  ?Subroutine20
+       1  ?Subroutine21
+       6  ?Subroutine22
+       7  ?Subroutine23
+      11  ?Subroutine24
+      24  ?Subroutine25
+      10  ?Subroutine26
+       6  ?Subroutine27
+      10  ?Subroutine28
+       6  ?Subroutine29
+       4  ?Subroutine3
+       9  ?Subroutine30
+       2  ?Subroutine31
+       9  ?Subroutine32
+       2  ?Subroutine33
+       5  ?Subroutine34
+      12  ?Subroutine35
+       9  ?Subroutine36
+       9  ?Subroutine37
+       9  ?Subroutine38
+       4  ?Subroutine39
+       4  ?Subroutine4
+       3  ?Subroutine40
+       3  ?Subroutine41
+       7  ?Subroutine42
+       9  ?Subroutine43
+      19  ?Subroutine44
+      22  ?Subroutine45
+      13  ?Subroutine46
+       8  ?Subroutine47
+       8  ?Subroutine48
+      13  ?Subroutine49
+       4  ?Subroutine5
+      10  ?Subroutine50
+       2  ?Subroutine51
+      10  ?Subroutine52
+       2  ?Subroutine53
+       7  ?Subroutine54
+      13  ?Subroutine55
+       6  ?Subroutine56
+       6  ?Subroutine57
+       3  ?Subroutine58
+       6  ?Subroutine59
+       8  ?Subroutine6
+       3  ?Subroutine60
+      24  ?Subroutine7
+       6  ?Subroutine8
+       8  ?Subroutine9
+       6  ?_0
+      19  ?_1
+      23  ?_2
+      10  ?_3
+      50  ABIO_Function
+      70  AllRadio
+      76  Auto_Exit_LearnMode_Function
+      25  Broadcast_info
+       2  CalculateRssi
+       1  Choose_Line
+     100  ClearFlash
+      76  CommonMode_OperateLine
+     134  ControlByAirLearn_NewWriteInFlash
+      65  FindIdInFlash
+       1  FindIdInFlash_return_num
+      40  FirstPower
+       1  IdNum
+       2  IdStartAddress
+      97  InitAllGpio
+     165  InitRegister
+      88  Key1_Function
+       1  Key1_InterruptPushflag
+       1  Key1_Short_Pushed
+       1  LearnModeWaitForConfirm
+     117  LearnMode_Function
+      14  Led1_Off
+       1  Public_learned_ID_num
+       1  Radio_Can_Operated
+      33  Radio_Data
+     134  Radio_Recive
+     107  ReadIdInFlash
+     133  Reply_RequestFlashData
+       1  Return_FindInFlash
+     117  SaveInfoInFlash
+     228  UpdateDatasAdressInFlash
+       4  WaitForConfirm_time
+     102  WriteIdInFlash
+     116  WriteKeyOperationInFlash
+       4  auto_exit_time
+       1  check_key1
+       1  clear_pll_clock
+      54  delay
+       1  firstpower
+     125  halRfReceivePacket
+      50  halRfSendPacket
+       4  key1_time_count
+       1  learn_mode
+       1  led_blink_time
+       1  led_flash
+     104  main
+       1  max_radio_length
+      94  radio_0_function
+      62  radio_2_function
+     132  radio_3_function
+      63  radio_7_function
+     167  radio_9_function
+       1  receive_radio_length
+       1  receiveflag
+      64  timer2_delay
+       4  timer2_delay_time
+       4  timer3_Operate_time
+
+ 
+   185 bytes in section .near.bss
+     8 bytes in section .near.data
+    58 bytes in section .near.rodata
+ 3 461 bytes in section .near_func.text
+ 
+ 3 461 bytes of CODE  memory
+    58 bytes of CONST memory
+   193 bytes of DATA  memory
+
+Errors: none
+Warnings: 1

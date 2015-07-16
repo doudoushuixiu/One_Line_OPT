@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<userOverrides>
+  <override>
+    <path>C:\Users\THINK\Documents\GitHub\868mhz-TwoLine-Operater\Operater-stm8s051-DoubleLine\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Project\mengling - 868Mhz - test(CODING)\main.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>C:\Users\THINK\Documents\GitHub\868mhz-TwoLine-Operater\STM8L051\Project\main_code\main.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>C:\Users\THINK\Documents\GitHub\868mhz-TwoLine-Operater\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Project\mengling - 868Mhz - test(CODING)\main.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>C:\Users\THINK\Documents\GitHub\ESE-TwoLine-Operater\STM8L051\Project\main_code\main.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>C:\Users\THINK\Documents\GitHub\FTT-TwoLine-Operater\STM8L051\Project\main_code\main.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\main.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>C:\Users\THINK\Dropbox\Project_Coding\Operater-stm8s051-DoubleLine\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Project\mengling - 868Mhz - test(CODING)\main.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>C:\Users\root\Dropbox\Project_Coding\DoorBell-stm8s051-DoubleLine\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Project\mengling - 868Mhz - test(CODING)\main.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>G:\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Project\spi_cc1101_receive\main.c</path>
+    <encoding>UTF-8</encoding>
+  </override>
+</userOverrides>
+
+
