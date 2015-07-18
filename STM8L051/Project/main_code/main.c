@@ -1,7 +1,6 @@
 /**                               **
         433Mhz CC1101 Receiver
              One_Line_OPT
-             Xu jiawei
 **                                **/
 
 #include "stm8l15x.h"
@@ -23,8 +22,8 @@
 #define  LINE1_SN_2  0x00
 #define  LINE1_SN_3  0x00
 #define  LINE1_SN_4  0x00
-#define  LINE1_SN_5  0x00
-#define  LINE1_SN_6  0x01
+#define  LINE1_SN_5  0x01
+#define  LINE1_SN_6  0x05
 
 
 
@@ -333,7 +332,6 @@ INT8U halRfReceivePacket(INT8U *rxBuffer, INT8U *length)
             else 
             {
                 halSpiStrobe(0x36);halSpiStrobe(0x34);             //矫正CC1101时钟
-           //     GPIO_ToggleBits(LED2_BLUE_PORT ,LED2_BLUE_PIN ); 
                 return 0;
             }               
         }
@@ -342,14 +340,12 @@ INT8U halRfReceivePacket(INT8U *rxBuffer, INT8U *length)
             *length = packetLength;
             halSpiStrobe(0x3A);
             halSpiStrobe(0x36);halSpiStrobe(0x34);            //矫正CC1101时钟 
-       //     GPIO_ToggleBits(LED2_BLUE_PORT ,LED2_BLUE_PIN ); 
             return 0;
         }
     }
     else
     {   
         halSpiStrobe(0x3A);halSpiStrobe(0x36);halSpiStrobe(0x34);
-      //  GPIO_ToggleBits(LED2_BLUE_PORT ,LED2_BLUE_PIN );
     } //清洗接收缓冲区
     return 0;        
 }
@@ -359,7 +355,7 @@ void halRfSendPacket(INT8U *txBuffer, INT8U size)
     halSpiWriteReg(0x3F, size);   
     halSpiWriteBurstReg(0x3F, txBuffer, size);	//写入发送数据    
     halSpiStrobe(0x35);                         //进入发送模式
-    timer2_delay(3);  //3ms
+    timer2_delay(2); 
     halSpiStrobe(0x3B);                        //清空发送区数据
 }
 
@@ -376,6 +372,7 @@ void  Key1_Function(void)
           Key1_InterruptPushflag  = 0;
           Key1_Short_Pushed = 1; 
           check_key1 = 0;
+          key1_time_count = 0;
         }
     }
     if(KEY1_INPUT)
@@ -385,8 +382,10 @@ void  Key1_Function(void)
     }
     
     /** 按键1-长按进入学习模式 **/
-    if((key1_time_count > 400)  && (learn_mode == OFF) )
-    {        
+    if(key1_time_count > 320)
+    {
+      if(learn_mode == OFF)
+      {
         //定时器在按键1中断中开启，至此未关闭 
         Key1_InterruptPushflag = 0;
         check_key1 = 0;
@@ -395,8 +394,9 @@ void  Key1_Function(void)
         Key1_Short_Pushed = 0;
 
         learn_mode          = ON;           //置学习模式标志为1                                  
-        WaitForConfirm_time = 0; 
-    }                 
+        WaitForConfirm_time = 0;       
+      }   
+    }              
 }
 
      
@@ -739,7 +739,6 @@ void ClearFlash(void)
     for(i = 0 ; i <= MAXLEARNNUM * 0x10 ; i++)
     {
         FLASH_ProgramByte(add,0x00);
-       // IWDG_ReloadCounter();    //喂狗
         add ++ ;  
     }
     for(i = 0 ; i < MAXLEARNNUM ; i ++)
@@ -768,7 +767,7 @@ void Broadcast_info(void)
 **/
 void LearnMode_Function(void)
 {
-    INT8U findInFlashReturnAdress = 0;
+   // INT8U findInFlashReturnAdress = 0;
     if(learn_mode == ON )
     {
         /* 学习模式时 LED指示灯与继电器提示  */
@@ -788,8 +787,42 @@ void LearnMode_Function(void)
                 CLOSE_LINE1;
                 Led1_Off();
             }               
-        }        
-     
+        }  
+        
+        if(LearnModeWaitForConfirm == OFF)   //学习期间led闪烁
+        {
+          if(led_blink_time == 0x70)
+          {
+            led_blink_time = 0;
+            if(GPIO_ReadOutputDataBit(LINE1_PORT, LINE1_PIN) == 0)
+            {
+              OPEN_LINE1;
+              LED1_GREEN;
+            }
+            else
+            {
+              CLOSE_LINE1;
+              Led1_Off();             
+            }  
+          }           
+        }
+        else if(LearnModeWaitForConfirm == ON)  //待确认时led闪烁
+        {
+          if(led_blink_time == 0x30)
+          {
+            led_blink_time = 0;
+            if(GPIO_ReadOutputDataBit(LINE1_PORT, LINE1_PIN) == 0)
+            {
+              OPEN_LINE1;
+              LED1_GREEN;
+            }
+            else
+            {
+              CLOSE_LINE1;
+              Led1_Off();             
+            }  
+          }         
+        }
         /*  学习模式时，用于确认 */
         if((Key1_Short_Pushed == 1) && (LearnModeWaitForConfirm == ON))               //若key1按键按下，则已经确认，则将报文信息写入Flash
         {
@@ -797,15 +830,14 @@ void LearnMode_Function(void)
             LearnModeWaitForConfirm = OFF;         //已经确认，取消等待状态
             learn_mode              = OFF;         //退出学习模式，进入工作模式 
             SaveInfoInFlash();                     //保存信息  ************          
-            Key1_Short_Pushed = 0;
-                      
+            Key1_Short_Pushed = 0;                    
             //led提示写入成功               
-            while(led_flash < 3)
+            while(led_flash < 4)
             {
                 LED1_GREEN;
-                timer2_delay(100);            
+                timer2_delay(60);            
                 Led1_Off();
-                timer2_delay(100);
+                timer2_delay(60);
                 led_flash++;
             }
             led_flash = 0;                                
@@ -956,6 +988,7 @@ void  Radio_Recive(void)
     {
         if((Radio_Data[0] == 7) && (Radio_Data[5] < 2))    
         {         
+            Key1_Short_Pushed = 0;
             LearnModeWaitForConfirm = ON;          //进入 等待确认 
             WaitForConfirm_time     = 0;           //自动退出学习确认等待时间 清零   
         }                     
@@ -993,14 +1026,14 @@ INT8U CommonMode_OperateLine(INT8U Key_num,INT8U AdressOfData)
      }  
      if((Key_num == ABIO_TOOGLE) && (ABIO_Function[AdressOfData].TOOGLE_Line1 == ABIO_TOOGLE))
      { 
-       //TOOGLE_LINE1; 
-      //GPIO_ToggleBits(LED1_RED_PORT,LED1_RED_PIN);       
+       TOOGLE_LINE1; 
+       flash_line_num = 1; 
      }         
     
      if(flash_line_num == 1)
      {
         LED1_GREEN;
-        delay(100);
+        delay(50);
         Led1_Off(); 
      }
      return 0;
@@ -1058,7 +1091,12 @@ INT8U radio_9_function(void)
        { replay_data[19] = 0x00; }   
             
        //子设备SN
-       replay_data[1]=LINE1_SN_1;replay_data[2]=LINE1_SN_2;replay_data[3]=LINE1_SN_3;replay_data[4]=LINE1_SN_4;replay_data[5]=LINE1_SN_5;replay_data[6]=LINE1_SN_6;
+       replay_data[1]=LINE1_SN_1;
+       replay_data[2]=LINE1_SN_2;
+       replay_data[3]=LINE1_SN_3;
+       replay_data[4]=LINE1_SN_4;
+       replay_data[5]=LINE1_SN_5;
+       replay_data[6]=LINE1_SN_6;
        
     }  
     else
@@ -1070,7 +1108,6 @@ INT8U radio_9_function(void)
      for(int i=7;i<19;i++)
      {  replay_data[i] = Radio_Data[i+1]; }
      
-     timer2_delay(15);                //延时，考虑到请求端需要一定时间进入接收状态
      halRfSendPacket( replay_data, 21 );
 
      return 0;
@@ -1165,7 +1202,7 @@ void main(void)
     FirstPower();                            //判断是否是第一次开机   
     ReadIdInFlash();                         //读Flash中ID   
     
-    LED1_BLUE;                     //开机LED提示
+    LED1_BLUE;                              //开机LED提示
     delay(3000);  
     Led1_Off();
          
@@ -1177,7 +1214,7 @@ void main(void)
         if((clear_pll_clock == 1) && (receiveflag == 0) && (learn_mode == OFF))    
         {  
           clear_pll_clock = 0;
-          halSpiStrobe(0x36);halSpiStrobe(0x34);timer2_delay(1);       //矫正时钟
+          halSpiStrobe(0x36);halSpiStrobe(0x34);//矫正时钟
           receiveflag = 0;
         }
       

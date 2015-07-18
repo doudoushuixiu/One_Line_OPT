@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// IAR C/C++ Compiler V2.10.2.149 for STM8                16/Jul/2015  14:33:43
+// IAR C/C++ Compiler V2.10.2.149 for STM8                17/Jul/2015  16:50:37
 // Copyright 2010-2014 IAR Systems AB.
 //
 //    Source file  =  
@@ -1045,7 +1045,7 @@ RadioSettings:
         CLR       S:?b0
         LD        A, #0x25
         CALL      L:halSpiWriteReg
-//  137     halSpiWriteReg(0x26,0x1F);          //FSCAL0     
+//  137     halSpiWriteReg(0x26,0x1F);          //FSCAL0        
         MOV       S:?b0, #0x1f
         LD        A, #0x26
         CALL      L:halSpiWriteReg

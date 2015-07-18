@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# IAR C/C++ Compiler V2.10.2.149 for STM8                 16/Jul/2015  14:33:43
+# IAR C/C++ Compiler V2.10.2.149 for STM8                 17/Jul/2015  16:50:37
 # Copyright 2010-2014 IAR Systems AB.
 #
 #    Source file  =  
@@ -497,7 +497,7 @@ C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\cc1101.c
    \   0000B8 3F ..        CLR       S:?b0
    \   0000BA A6 25        LD        A, #0x25
    \   0000BC CD ....      CALL      L:halSpiWriteReg
-    137              halSpiWriteReg(0x26,0x1F);          //FSCAL0     
+    137              halSpiWriteReg(0x26,0x1F);          //FSCAL0        
    \   0000BF 35 1F ....   MOV       S:?b0, #0x1f
    \   0000C3 A6 26        LD        A, #0x26
    \   0000C5 CD ....      CALL      L:halSpiWriteReg

@@ -134,7 +134,7 @@ void RadioSettings(void)
     halSpiWriteReg(0x23,0xEA);          //FSCAL3
     halSpiWriteReg(0x24,0x2A);          //FSCAL2    
     halSpiWriteReg(0x25,0x00);          //FSCAL1
-    halSpiWriteReg(0x26,0x1F);          //FSCAL0     
+    halSpiWriteReg(0x26,0x1F);          //FSCAL0        
     
     halSpiWriteBurstReg(0x3E,PaTabel,8);//配置cc1101功率 
 }
