@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// IAR C/C++ Compiler V2.10.2.149 for STM8                16/Jul/2015  14:33:44
+// IAR C/C++ Compiler V2.10.2.149 for STM8                18/Jul/2015  12:44:46
 // Copyright 2010-2014 IAR Systems AB.
 //
 //    Source file  =  
@@ -63,6 +63,7 @@
         EXTERN check_key1
         EXTERN clear_pll_clock
         EXTERN key1_time_count
+        EXTERN key_pressed
         EXTERN learn_mode
         EXTERN led_blink_time
         EXTERN receiveflag
@@ -189,7 +190,7 @@
 ten_second:
         DS8 4
 //   25 extern  unsigned char   clear_pll_clock ;
-//   26 
+//   26 extern  unsigned char   key_pressed;   //0:按键没松口    1：按键松开了
 //   27 
 //   28 
 //   29 /* RTC定时唤醒 */
@@ -491,22 +492,24 @@ _interrupt_16:
           CFI ?b5 Frame(CFA, -15)
           CFI ?b4 Frame(CFA, -16)
           CFI CFA SP+17
-//   54     key1_time_count = 0;
+//   54     key_pressed = 0;
+        CLR       L:key_pressed
+//   55     key1_time_count = 0;
         CLRW      X
         LDW       L:key1_time_count, X
         LDW       L:key1_time_count + 2, X
-//   55     auto_exit_time  = 0;
+//   56     auto_exit_time  = 0;
         LDW       L:auto_exit_time, X
         LDW       L:auto_exit_time + 2, X
-//   56     TIM4_Cmd(ENABLE);      
+//   57     TIM4_Cmd(ENABLE);      
         LD        A, #0x1
         CALL      L:TIM4_Cmd
-//   57     Key1_InterruptPushflag = 1;
+//   58     Key1_InterruptPushflag = 1;
         MOV       L:Key1_InterruptPushflag, #0x1
-//   58     EXTI_ClearITPendingBit(EXTI_IT_Pin6);
+//   59     EXTI_ClearITPendingBit(EXTI_IT_Pin6);
         LDW       X, #0x40
         CALL      L:EXTI_ClearITPendingBit
-//   59 }
+//   60 }
         CALL      L:?pop_l1
           CFI ?b4 SameValue
           CFI ?b5 SameValue
@@ -521,18 +524,18 @@ _interrupt_16:
           CFI CFA SP+9
         IRET
           CFI EndBlock cfiBlock16
-//   60 
-//   61 /* 
-//   62 Time4定时器中断 
-//   63 按键计时
-//   64 */
+//   61 
+//   62 /* 
+//   63 Time4定时器中断 
+//   64 按键计时
+//   65 */
 
         SECTION `.near_func.text`:CODE:REORDER:NOROOT(0)
           CFI Block cfiBlock17 Using cfiCommon0
           CFI Function TIM4_UPD_OVF_TRG_IRQHandler
         CODE
-//   65 INTERRUPT_HANDLER(TIM4_UPD_OVF_TRG_IRQHandler, 25)
-//   66 {         
+//   66 INTERRUPT_HANDLER(TIM4_UPD_OVF_TRG_IRQHandler, 25)
+//   67 {         
 TIM4_UPD_OVF_TRG_IRQHandler:
 _interrupt_27:
         CALL      L:?Subroutine1
@@ -549,63 +552,63 @@ _interrupt_27:
           CFI ?b5 Frame(CFA, -15)
           CFI ?b4 Frame(CFA, -16)
           CFI CFA SP+17
-//   67     if(Key1_InterruptPushflag == 1)
+//   68     if(Key1_InterruptPushflag == 1)
         LD        A, L:Key1_InterruptPushflag
         CP        A, #0x1
         JRNE      L:??TIM4_UPD_OVF_TRG_IRQHandler_0
-//   68     { 
-//   69         check_key1 = 1;
+//   69     { 
+//   70         check_key1 = 1;
         MOV       L:check_key1, #0x1
-//   70         if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 0)
+//   71         if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 0)
         LD        A, #0x1
         LDW       X, #0x5005
         CALL      L:GPIO_ReadInputDataBit
         CP        A, #0x0
         JRNE      L:??TIM4_UPD_OVF_TRG_IRQHandler_0
-//   71         { key1_time_count++; }      
+//   72         { key1_time_count++; }      
         LDW       X, #key1_time_count
         CALL      L:?Subroutine0
-//   72     }
+//   73     }
 ??CrossCallReturnLabel_2:
         LDW       X, #key1_time_count
         CALL      L:?load32_0x_l0
-//   73            
-//   74     if(learn_mode == 0x11)
+//   74            
+//   75     if(learn_mode == 0x11)
 ??TIM4_UPD_OVF_TRG_IRQHandler_0:
         LD        A, L:learn_mode
         CP        A, #0x11
         JRNE      L:??TIM4_UPD_OVF_TRG_IRQHandler_1
-//   75     {        
-//   76         auto_exit_time++;       
+//   76     {        
+//   77         auto_exit_time++;       
         LDW       X, #auto_exit_time
         CALL      L:?Subroutine0
 ??CrossCallReturnLabel_3:
         LDW       X, #auto_exit_time
         CALL      L:?load32_0x_l0
-//   77         led_blink_time++;        
+//   78         led_blink_time++;        
         LD        A, L:led_blink_time
         INC       A
         LD        L:led_blink_time, A
-//   78     }        
-//   79     if(LearnModeWaitForConfirm == 0x11)
+//   79     }        
+//   80     if(LearnModeWaitForConfirm == 0x11)
 ??TIM4_UPD_OVF_TRG_IRQHandler_1:
         LD        A, L:LearnModeWaitForConfirm
         CP        A, #0x11
         JRNE      L:??TIM4_UPD_OVF_TRG_IRQHandler_2
-//   80     {
-//   81         auto_exit_time = 0;
+//   81     {
+//   82         auto_exit_time = 0;
         CLRW      X
         LDW       L:auto_exit_time, X
         LDW       L:auto_exit_time + 2, X
-//   82         WaitForConfirm_time++;
+//   83         WaitForConfirm_time++;
         LDW       X, #WaitForConfirm_time
         CALL      L:?Subroutine0
-//   83     }   
+//   84     }   
 ??CrossCallReturnLabel_4:
         LDW       X, #WaitForConfirm_time
         CALL      L:?load32_0x_l0
-//   84     
-//   85     if(key1_time_count > 4000)
+//   85     
+//   86     if(key1_time_count > 4000)
 ??TIM4_UPD_OVF_TRG_IRQHandler_2:
         LDW       X, #key1_time_count
         CALL      L:?load32_l0_0x
@@ -616,16 +619,16 @@ _interrupt_27:
         CPW       X, #0xfa1
 ??TIM4_UPD_OVF_TRG_IRQHandler_3:
         JRC       L:??TIM4_UPD_OVF_TRG_IRQHandler_4
-//   86     {key1_time_count = 0;}
+//   87     {key1_time_count = 0;}
         CLRW      X
         LDW       L:key1_time_count, X
         LDW       L:key1_time_count + 2, X
-//   87  
-//   88     TIM4_ClearITPendingBit(TIM4_IT_Update);
+//   88  
+//   89     TIM4_ClearITPendingBit(TIM4_IT_Update);
 ??TIM4_UPD_OVF_TRG_IRQHandler_4:
         LD        A, #0x1
         CALL      L:TIM4_ClearITPendingBit
-//   89 }
+//   90 }
         CALL      L:?pop_l1
           CFI ?b4 SameValue
           CFI ?b5 SameValue
@@ -640,18 +643,18 @@ _interrupt_27:
           CFI CFA SP+9
         IRET
           CFI EndBlock cfiBlock17
-//   90 
-//   91 /* 
-//   92 Time2定时器中断
-//   93 延时计时
-//   94 */
+//   91 
+//   92 /* 
+//   93 Time2定时器中断
+//   94 延时计时
+//   95 */
 
         SECTION `.near_func.text`:CODE:REORDER:NOROOT(0)
           CFI Block cfiBlock18 Using cfiCommon0
           CFI Function TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler
         CODE
-//   95 INTERRUPT_HANDLER(TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler, 19)
-//   96 {      
+//   96 INTERRUPT_HANDLER(TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler, 19)
+//   97 {      
 TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler:
 _interrupt_21:
         CALL      L:?Subroutine1
@@ -668,29 +671,29 @@ _interrupt_21:
           CFI ?b5 Frame(CFA, -15)
           CFI ?b4 Frame(CFA, -16)
           CFI CFA SP+17
-//   97      timer2_delay_time ++;  
+//   98      timer2_delay_time ++;  
         LDW       X, #timer2_delay_time
         CALL      L:?Subroutine0
 ??CrossCallReturnLabel_1:
         LDW       X, #timer2_delay_time
         CALL      L:?Subroutine2
-//   98      if(timer2_delay_time > 4000)
+//   99      if(timer2_delay_time > 4000)
 ??CrossCallReturnLabel_13:
         JRNE      L:??TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler_0
         LDW       X, S:?w1
         CPW       X, #0xfa1
 ??TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler_0:
         JRC       L:??TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler_1
-//   99      { timer2_delay_time = 0; }         
+//  100      { timer2_delay_time = 0; }         
         CLRW      X
         LDW       L:timer2_delay_time, X
         LDW       L:timer2_delay_time + 2, X
-//  100      
-//  101      TIM2_ClearITPendingBit(TIM2_IT_Update);
+//  101      
+//  102      TIM2_ClearITPendingBit(TIM2_IT_Update);
 ??TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler_1:
         LD        A, #0x1
         CALL      L:TIM2_ClearITPendingBit
-//  102 }
+//  103 }
         CALL      L:?pop_l1
           CFI ?b4 SameValue
           CFI ?b5 SameValue
@@ -742,19 +745,19 @@ _interrupt_21:
           CFI EndBlock cfiCond19
           CFI EndBlock cfiCond20
           CFI EndBlock cfiPicker21
-//  103 
 //  104 
-//  105 /* 
-//  106 Time3定时器中断 
-//  107 接收报文时开启 用以实现多个报文接收时只操作一次
-//  108 */
+//  105 
+//  106 /* 
+//  107 Time3定时器中断 
+//  108 接收报文时开启 用以实现多个报文接收时只操作一次
+//  109 */
 
         SECTION `.near_func.text`:CODE:REORDER:NOROOT(0)
           CFI Block cfiBlock22 Using cfiCommon0
           CFI Function TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler
         CODE
-//  109 INTERRUPT_HANDLER(TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler, 21)
-//  110 {
+//  110 INTERRUPT_HANDLER(TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler, 21)
+//  111 {
 TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler:
 _interrupt_23:
         CALL      L:?Subroutine1
@@ -771,38 +774,38 @@ _interrupt_23:
           CFI ?b5 Frame(CFA, -15)
           CFI ?b4 Frame(CFA, -16)
           CFI CFA SP+17
-//  111      timer3_Operate_time ++;
+//  112      timer3_Operate_time ++;
         LDW       X, #timer3_Operate_time
         CALL      L:?Subroutine0
 ??CrossCallReturnLabel_0:
         LDW       X, #timer3_Operate_time
         CALL      L:?Subroutine2
-//  112      
-//  113      if(timer3_Operate_time > 11)
+//  113      
+//  114      if(timer3_Operate_time > 11)
 ??CrossCallReturnLabel_12:
         JRNE      L:??TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler_0
         LDW       X, S:?w1
         CPW       X, #0xc
 ??TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler_0:
         JRC       L:??TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler_1
-//  114      {
-//  115          timer3_Operate_time = 0;
+//  115      {
+//  116          timer3_Operate_time = 0;
         CLRW      X
         LDW       L:timer3_Operate_time, X
         LDW       L:timer3_Operate_time + 2, X
-//  116          Radio_Can_Operated = 1;     //恢复可操作状态        
+//  117          Radio_Can_Operated = 1;     //恢复可操作状态        
         MOV       L:Radio_Can_Operated, #0x1
-//  117          clear_pll_clock = 1;
+//  118          clear_pll_clock = 1;
         MOV       L:clear_pll_clock, #0x1
-//  118          TIM3_Cmd(DISABLE);  
+//  119          TIM3_Cmd(DISABLE);  
         CLR       A
         CALL      L:TIM3_Cmd
-//  119      }       
-//  120      TIM3_ClearITPendingBit(TIM3_IT_Update);
+//  120      }       
+//  121      TIM3_ClearITPendingBit(TIM3_IT_Update);
 ??TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler_1:
         LD        A, #0x1
         CALL      L:TIM3_ClearITPendingBit
-//  121 }
+//  122 }
         CALL      L:?pop_l1
           CFI ?b4 SameValue
           CFI ?b5 SameValue
@@ -821,7 +824,6 @@ _interrupt_23:
         SECTION VREGS:DATA:REORDER:NOROOT(0)
 
         END
-//  122 
 //  123 
 //  124 
 //  125 
@@ -829,11 +831,12 @@ _interrupt_23:
 //  127 
 //  128 
 //  129 
+//  130 
 // 
 //   4 bytes in section .near.bss
-// 402 bytes in section .near_func.text
+// 406 bytes in section .near_func.text
 // 
-// 402 bytes of CODE memory
+// 406 bytes of CODE memory
 //   4 bytes of DATA memory
 //
 //Errors: none

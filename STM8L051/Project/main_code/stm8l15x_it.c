@@ -23,7 +23,7 @@ extern  unsigned char   check_key1;
 
 unsigned long           ten_second = 0;
 extern  unsigned char   clear_pll_clock ;
-
+extern  unsigned char   key_pressed;   //0:按键没松口    1：按键松开了
 
 
 /* RTC定时唤醒 */
@@ -51,6 +51,7 @@ INTERRUPT_HANDLER(EXTI2_IRQHandler,10)
 /* 按键1 中断 */
 INTERRUPT_HANDLER(EXTI6_IRQHandler,14)
 {   
+    key_pressed = 0;
     key1_time_count = 0;
     auto_exit_time  = 0;
     TIM4_Cmd(ENABLE);      

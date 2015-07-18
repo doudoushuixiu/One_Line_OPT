@@ -1,5 +1,5 @@
 [DebugChecksum]
-Checksum=1296182611
+Checksum=1943550057
 [Stack]
 FillEnabled=0
 OverflowWarningsEnabled=1
@@ -67,8 +67,6 @@ LogEnabled=0
 GraphEnabled=0
 ShowTimeLog=1
 ShowTimeSum=1
-[Breakpoints]
-Count=0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -76,22 +74,11 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
+[Breakpoints]
+Bp0=_ "STD_CODE" "{$PROJ_DIR$\..\main.c}.1.1" 1 0 0 0 "" 0 ""
+Count=1
 [Aliases]
-A0=_ "C:\Users\admin\Desktop\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_clk.c" ""
-A1=_ "C:\Users\admin\Desktop\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_flash.c" ""
-A2=_ "C:\Users\admin\Desktop\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_gpio.c" ""
-A3=_ "C:\Users\admin\Desktop\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_tim4.c" ""
-A4=_ "C:\Users\root\Dropbox\Project_Coding\DoorBell-stm8s051-DoubleLine\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Project\mengling - 868Mhz - test(CODING)\main.c" ""
-A5=_ "C:\Users\root\Dropbox\Project_Coding\DoorBell-stm8s051-DoubleLine\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Project\mengling - 868Mhz - test(CODING)\stm8l15x_it.c" "C:\Users\THINK\Dropbox\Project_Coding\Operater-stm8s051-DoubleLine\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Libraries\stm8l15x_gpio.c"
-A6=_ "C:\Users\root\Dropbox\Project_Coding\DoorBell-stm8s051\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_clk.c" ""
-A7=_ "C:\Users\root\Dropbox\Project_Coding\DoorBell-stm8s051\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_exti.c" ""
-A8=_ "C:\Users\root\Dropbox\Project_Coding\DoorBell-stm8s051\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_gpio.c" ""
-A9=_ "C:\Users\root\Dropbox\Project_Coding\DoorBell-stm8s051\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_rtc.c" ""
-A10=_ "C:\Users\root\Dropbox\Project_Coding\DoorBell-stm8s051\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Project\mengling - 868Mhz - test(CODING) - oneline - 22\main.c" ""
-A11=_ "G:\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_clk.c" ""
-A12=_ "G:\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_flash.c" ""
-A13=_ "G:\STM8L15x-16x-05x-AL31-L_StdPeriph_Lib_V1.6.1\Libraries\STM8L15x_StdPeriph_Driver\src\stm8l15x_gpio.c" ""
-Count=14
-SuppressDialog=1
+Count=0
+SuppressDialog=0
 [DebuggerSettings]
 DisableInterruptsWhenStepping=0

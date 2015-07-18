@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# IAR C/C++ Compiler V2.10.2.149 for STM8                 16/Jul/2015  14:33:44
+# IAR C/C++ Compiler V2.10.2.149 for STM8                 18/Jul/2015  12:44:46
 # Copyright 2010-2014 IAR Systems AB.
 #
 #    Source file  =  
@@ -64,7 +64,7 @@ C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\stm8l15x
    \                     ten_second:
    \   000000              DS8 4
      25          extern  unsigned char   clear_pll_clock ;
-     26          
+     26          extern  unsigned char   key_pressed;   //0:按键没松口    1：按键松开了
      27          
      28          
      29          /* RTC定时唤醒 */
@@ -161,97 +161,99 @@ C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\stm8l15x
    \                     ??CrossCallReturnLabel_9:
    \   000003 CD ....      CALL      L:?push_l0
    \   000006 CD ....      CALL      L:?push_l1
-     54              key1_time_count = 0;
-   \   000009 5F           CLRW      X
-   \   00000A CF ....      LDW       L:key1_time_count, X
-   \   00000D CF ....      LDW       L:key1_time_count + 2, X
-     55              auto_exit_time  = 0;
-   \   000010 CF ....      LDW       L:auto_exit_time, X
-   \   000013 CF ....      LDW       L:auto_exit_time + 2, X
-     56              TIM4_Cmd(ENABLE);      
-   \   000016 A6 01        LD        A, #0x1
-   \   000018 CD ....      CALL      L:TIM4_Cmd
-     57              Key1_InterruptPushflag = 1;
-   \   00001B 35 01 ....   MOV       L:Key1_InterruptPushflag, #0x1
-     58              EXTI_ClearITPendingBit(EXTI_IT_Pin6);
-   \   00001F AE 0040      LDW       X, #0x40
-   \   000022 CD ....      CALL      L:EXTI_ClearITPendingBit
-     59          }
-   \   000025 CD ....      CALL      L:?pop_l1
-   \   000028 CD ....      CALL      L:?pop_l0
-   \   00002B 80           IRET
-     60          
-     61          /* 
-     62          Time4定时器中断 
-     63          按键计时
-     64          */
+     54              key_pressed = 0;
+   \   000009 725F ....    CLR       L:key_pressed
+     55              key1_time_count = 0;
+   \   00000D 5F           CLRW      X
+   \   00000E CF ....      LDW       L:key1_time_count, X
+   \   000011 CF ....      LDW       L:key1_time_count + 2, X
+     56              auto_exit_time  = 0;
+   \   000014 CF ....      LDW       L:auto_exit_time, X
+   \   000017 CF ....      LDW       L:auto_exit_time + 2, X
+     57              TIM4_Cmd(ENABLE);      
+   \   00001A A6 01        LD        A, #0x1
+   \   00001C CD ....      CALL      L:TIM4_Cmd
+     58              Key1_InterruptPushflag = 1;
+   \   00001F 35 01 ....   MOV       L:Key1_InterruptPushflag, #0x1
+     59              EXTI_ClearITPendingBit(EXTI_IT_Pin6);
+   \   000023 AE 0040      LDW       X, #0x40
+   \   000026 CD ....      CALL      L:EXTI_ClearITPendingBit
+     60          }
+   \   000029 CD ....      CALL      L:?pop_l1
+   \   00002C CD ....      CALL      L:?pop_l0
+   \   00002F 80           IRET
+     61          
+     62          /* 
+     63          Time4定时器中断 
+     64          按键计时
+     65          */
 
    \                                 In section .near_func.text, align 1
-     65          INTERRUPT_HANDLER(TIM4_UPD_OVF_TRG_IRQHandler, 25)
-     66          {         
+     66          INTERRUPT_HANDLER(TIM4_UPD_OVF_TRG_IRQHandler, 25)
+     67          {         
    \                     TIM4_UPD_OVF_TRG_IRQHandler:
    \                     _interrupt_27:
    \   000000 CD ....      CALL      L:?Subroutine1
    \                     ??CrossCallReturnLabel_8:
    \   000003 CD ....      CALL      L:?push_l0
    \   000006 CD ....      CALL      L:?push_l1
-     67              if(Key1_InterruptPushflag == 1)
+     68              if(Key1_InterruptPushflag == 1)
    \   000009 C6 ....      LD        A, L:Key1_InterruptPushflag
    \   00000C A1 01        CP        A, #0x1
    \   00000E 26 1C        JRNE      L:??TIM4_UPD_OVF_TRG_IRQHandler_0
-     68              { 
-     69                  check_key1 = 1;
+     69              { 
+     70                  check_key1 = 1;
    \   000010 35 01 ....   MOV       L:check_key1, #0x1
-     70                  if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 0)
+     71                  if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 0)
    \   000014 A6 01        LD        A, #0x1
    \   000016 AE 5005      LDW       X, #0x5005
    \   000019 CD ....      CALL      L:GPIO_ReadInputDataBit
    \   00001C A1 00        CP        A, #0x0
    \   00001E 26 0C        JRNE      L:??TIM4_UPD_OVF_TRG_IRQHandler_0
-     71                  { key1_time_count++; }      
+     72                  { key1_time_count++; }      
    \   000020 AE ....      LDW       X, #key1_time_count
    \   000023 CD ....      CALL      L:?Subroutine0
-     72              }
+     73              }
    \                     ??CrossCallReturnLabel_2:
    \   000026 AE ....      LDW       X, #key1_time_count
    \   000029 CD ....      CALL      L:?load32_0x_l0
-     73                     
-     74              if(learn_mode == 0x11)
+     74                     
+     75              if(learn_mode == 0x11)
    \                     ??TIM4_UPD_OVF_TRG_IRQHandler_0:
    \   00002C C6 ....      LD        A, L:learn_mode
    \   00002F A1 11        CP        A, #0x11
    \   000031 26 13        JRNE      L:??TIM4_UPD_OVF_TRG_IRQHandler_1
-     75              {        
-     76                  auto_exit_time++;       
+     76              {        
+     77                  auto_exit_time++;       
    \   000033 AE ....      LDW       X, #auto_exit_time
    \   000036 CD ....      CALL      L:?Subroutine0
    \                     ??CrossCallReturnLabel_3:
    \   000039 AE ....      LDW       X, #auto_exit_time
    \   00003C CD ....      CALL      L:?load32_0x_l0
-     77                  led_blink_time++;        
+     78                  led_blink_time++;        
    \   00003F C6 ....      LD        A, L:led_blink_time
    \   000042 4C           INC       A
    \   000043 C7 ....      LD        L:led_blink_time, A
-     78              }        
-     79              if(LearnModeWaitForConfirm == 0x11)
+     79              }        
+     80              if(LearnModeWaitForConfirm == 0x11)
    \                     ??TIM4_UPD_OVF_TRG_IRQHandler_1:
    \   000046 C6 ....      LD        A, L:LearnModeWaitForConfirm
    \   000049 A1 11        CP        A, #0x11
    \   00004B 26 13        JRNE      L:??TIM4_UPD_OVF_TRG_IRQHandler_2
-     80              {
-     81                  auto_exit_time = 0;
+     81              {
+     82                  auto_exit_time = 0;
    \   00004D 5F           CLRW      X
    \   00004E CF ....      LDW       L:auto_exit_time, X
    \   000051 CF ....      LDW       L:auto_exit_time + 2, X
-     82                  WaitForConfirm_time++;
+     83                  WaitForConfirm_time++;
    \   000054 AE ....      LDW       X, #WaitForConfirm_time
    \   000057 CD ....      CALL      L:?Subroutine0
-     83              }   
+     84              }   
    \                     ??CrossCallReturnLabel_4:
    \   00005A AE ....      LDW       X, #WaitForConfirm_time
    \   00005D CD ....      CALL      L:?load32_0x_l0
-     84              
-     85              if(key1_time_count > 4000)
+     85              
+     86              if(key1_time_count > 4000)
    \                     ??TIM4_UPD_OVF_TRG_IRQHandler_2:
    \   000060 AE ....      LDW       X, #key1_time_count
    \   000063 CD ....      CALL      L:?load32_l0_0x
@@ -262,57 +264,57 @@ C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\stm8l15x
    \   00006F A3 0FA1      CPW       X, #0xfa1
    \                     ??TIM4_UPD_OVF_TRG_IRQHandler_3:
    \   000072 25 07        JRC       L:??TIM4_UPD_OVF_TRG_IRQHandler_4
-     86              {key1_time_count = 0;}
+     87              {key1_time_count = 0;}
    \   000074 5F           CLRW      X
    \   000075 CF ....      LDW       L:key1_time_count, X
    \   000078 CF ....      LDW       L:key1_time_count + 2, X
-     87           
-     88              TIM4_ClearITPendingBit(TIM4_IT_Update);
+     88           
+     89              TIM4_ClearITPendingBit(TIM4_IT_Update);
    \                     ??TIM4_UPD_OVF_TRG_IRQHandler_4:
    \   00007B A6 01        LD        A, #0x1
    \   00007D CD ....      CALL      L:TIM4_ClearITPendingBit
-     89          }
+     90          }
    \   000080 CD ....      CALL      L:?pop_l1
    \   000083 CD ....      CALL      L:?pop_l0
    \   000086 80           IRET
-     90          
-     91          /* 
-     92          Time2定时器中断
-     93          延时计时
-     94          */
+     91          
+     92          /* 
+     93          Time2定时器中断
+     94          延时计时
+     95          */
 
    \                                 In section .near_func.text, align 1
-     95          INTERRUPT_HANDLER(TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler, 19)
-     96          {      
+     96          INTERRUPT_HANDLER(TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler, 19)
+     97          {      
    \                     TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler:
    \                     _interrupt_21:
    \   000000 CD ....      CALL      L:?Subroutine1
    \                     ??CrossCallReturnLabel_7:
    \   000003 CD ....      CALL      L:?push_l0
    \   000006 CD ....      CALL      L:?push_l1
-     97               timer2_delay_time ++;  
+     98               timer2_delay_time ++;  
    \   000009 AE ....      LDW       X, #timer2_delay_time
    \   00000C CD ....      CALL      L:?Subroutine0
    \                     ??CrossCallReturnLabel_1:
    \   00000F AE ....      LDW       X, #timer2_delay_time
    \   000012 CD ....      CALL      L:?Subroutine2
-     98               if(timer2_delay_time > 4000)
+     99               if(timer2_delay_time > 4000)
    \                     ??CrossCallReturnLabel_13:
    \   000015 26 05        JRNE      L:??TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler_0
    \   000017 BE ..        LDW       X, S:?w1
    \   000019 A3 0FA1      CPW       X, #0xfa1
    \                     ??TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler_0:
    \   00001C 25 07        JRC       L:??TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler_1
-     99               { timer2_delay_time = 0; }         
+    100               { timer2_delay_time = 0; }         
    \   00001E 5F           CLRW      X
    \   00001F CF ....      LDW       L:timer2_delay_time, X
    \   000022 CF ....      LDW       L:timer2_delay_time + 2, X
-    100               
-    101               TIM2_ClearITPendingBit(TIM2_IT_Update);
+    101               
+    102               TIM2_ClearITPendingBit(TIM2_IT_Update);
    \                     ??TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler_1:
    \   000025 A6 01        LD        A, #0x1
    \   000027 CD ....      CALL      L:TIM2_ClearITPendingBit
-    102          }
+    103          }
    \   00002A CD ....      CALL      L:?pop_l1
    \   00002D CD ....      CALL      L:?pop_l0
    \   000030 80           IRET
@@ -323,58 +325,57 @@ C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\stm8l15x
    \   000003 BE ..        LDW       X, S:?w0
    \   000005 A3 0000      CPW       X, #0x0
    \   000008 81           RET
-    103          
     104          
-    105          /* 
-    106          Time3定时器中断 
-    107          接收报文时开启 用以实现多个报文接收时只操作一次
-    108          */
+    105          
+    106          /* 
+    107          Time3定时器中断 
+    108          接收报文时开启 用以实现多个报文接收时只操作一次
+    109          */
 
    \                                 In section .near_func.text, align 1
-    109          INTERRUPT_HANDLER(TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler, 21)
-    110          {
+    110          INTERRUPT_HANDLER(TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler, 21)
+    111          {
    \                     TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler:
    \                     _interrupt_23:
    \   000000 CD ....      CALL      L:?Subroutine1
    \                     ??CrossCallReturnLabel_6:
    \   000003 CD ....      CALL      L:?push_l0
    \   000006 CD ....      CALL      L:?push_l1
-    111               timer3_Operate_time ++;
+    112               timer3_Operate_time ++;
    \   000009 AE ....      LDW       X, #timer3_Operate_time
    \   00000C CD ....      CALL      L:?Subroutine0
    \                     ??CrossCallReturnLabel_0:
    \   00000F AE ....      LDW       X, #timer3_Operate_time
    \   000012 CD ....      CALL      L:?Subroutine2
-    112               
-    113               if(timer3_Operate_time > 11)
+    113               
+    114               if(timer3_Operate_time > 11)
    \                     ??CrossCallReturnLabel_12:
    \   000015 26 05        JRNE      L:??TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler_0
    \   000017 BE ..        LDW       X, S:?w1
    \   000019 A3 000C      CPW       X, #0xc
    \                     ??TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler_0:
    \   00001C 25 13        JRC       L:??TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler_1
-    114               {
-    115                   timer3_Operate_time = 0;
+    115               {
+    116                   timer3_Operate_time = 0;
    \   00001E 5F           CLRW      X
    \   00001F CF ....      LDW       L:timer3_Operate_time, X
    \   000022 CF ....      LDW       L:timer3_Operate_time + 2, X
-    116                   Radio_Can_Operated = 1;     //恢复可操作状态        
+    117                   Radio_Can_Operated = 1;     //恢复可操作状态        
    \   000025 35 01 ....   MOV       L:Radio_Can_Operated, #0x1
-    117                   clear_pll_clock = 1;
+    118                   clear_pll_clock = 1;
    \   000029 35 01 ....   MOV       L:clear_pll_clock, #0x1
-    118                   TIM3_Cmd(DISABLE);  
+    119                   TIM3_Cmd(DISABLE);  
    \   00002D 4F           CLR       A
    \   00002E CD ....      CALL      L:TIM3_Cmd
-    119               }       
-    120               TIM3_ClearITPendingBit(TIM3_IT_Update);
+    120               }       
+    121               TIM3_ClearITPendingBit(TIM3_IT_Update);
    \                     ??TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler_1:
    \   000031 A6 01        LD        A, #0x1
    \   000033 CD ....      CALL      L:TIM3_ClearITPendingBit
-    121          }
+    122          }
    \   000036 CD ....      CALL      L:?pop_l1
    \   000039 CD ....      CALL      L:?pop_l0
    \   00003C 80           IRET
-    122          
     123          
     124          
     125          
@@ -382,6 +383,7 @@ C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\stm8l15x
     127          
     128          
     129          
+    130          
 
    Section sizes:
 
@@ -391,7 +393,7 @@ C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\stm8l15x
        7  ?Subroutine1
        9  ?Subroutine2
       38  EXTI2_IRQHandler
-      44  EXTI6_IRQHandler
+      48  EXTI6_IRQHandler
       53  RTC_CSSLSE_IRQHandler
       49  TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler
       61  TIM3_UPD_OVF_TRG_BRK_USART3_TX_IRQHandler
@@ -400,9 +402,9 @@ C:\Users\THINK\Documents\GitHub\One_Line_OPT\STM8L051\Project\main_code\stm8l15x
 
  
    4 bytes in section .near.bss
- 402 bytes in section .near_func.text
+ 406 bytes in section .near_func.text
  
- 402 bytes of CODE memory
+ 406 bytes of CODE memory
    4 bytes of DATA memory
 
 Errors: none
